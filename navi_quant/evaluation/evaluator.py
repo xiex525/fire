@@ -8,6 +8,8 @@ import pandas as pd
 from . import plots
 from .eva_utils import ForwardReturns, IC, QuantileReturns, compute_ic, compute_quantile_returns
 
+__all__ = ["Evaluator"]
+
 
 def to_datetime_index(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy(deep=False)
@@ -31,7 +33,7 @@ class Evaluator:
     def _reindex_forward_returns(self):
         self.forward_returns = {k: v.reindex_like(self.factor, copy=False) for k, v in self.forward_returns.items()}
 
-    def get_ic(self, method=typing.Literal["pearson", "kendall", "spearman"], plot=True) -> IC:
+    def get_ic(self, method: typing.Literal["pearson", "kendall", "spearman"], plot=True) -> IC:
         cache_key = ("ic", (method,))
         if cache_key not in self._result:
             self._result[cache_key] = compute_ic(self.factor, self.forward_returns, method)

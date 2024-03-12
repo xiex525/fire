@@ -6,6 +6,13 @@ import typing
 import numpy as np
 import pandas as pd
 
+__all__ = [
+    "compute_forward_returns",
+    "compute_ic",
+    "factor_to_quantile",
+    "compute_quantile_returns",
+]
+
 PeriodType = typing.NewType("PeriodType", int)
 ForwardReturns = typing.NewType("ForwardReturns", dict[PeriodType, pd.DataFrame])
 IC = typing.NewType("IC", pd.DataFrame)
@@ -29,13 +36,13 @@ def compute_forward_returns(price: pd.DataFrame, periods: list[PeriodType]) -> F
 
 
 def _compute_ic_df_df(
-    a: pd.DataFrame, b: pd.DataFrame, method=typing.Literal["pearson", "kendall", "spearman"]
+    a: pd.DataFrame, b: pd.DataFrame, method: typing.Literal["pearson", "kendall", "spearman"]
 ) -> pd.Series:
-    return a.corrwith(b, axis=0, method=method)
+    return a.corrwith(b, axis=1, method=method)
 
 
 def compute_ic(
-    factor: pd.DataFrame, forward_returns: ForwardReturns, method=typing.Literal["pearson", "kendall", "spearman"]
+    factor: pd.DataFrame, forward_returns: ForwardReturns, method: typing.Literal["pearson", "kendall", "spearman"]
 ) -> IC:
     """
     Compute IC (Information Coefficient) for the factor and forward returns, which is the correlation between the
@@ -93,6 +100,7 @@ def factor_to_quantile(factor: pd.DataFrame, quantiles: int = 5) -> pd.DataFrame
             new_values = quantile_values[-len(old_values) :]
             if not np.array_equal(old_values, new_values):
                 tmp.replace(old_values, new_values, inplace=True)
+            return tmp
         else:
             return row
 

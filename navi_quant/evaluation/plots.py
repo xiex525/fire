@@ -60,7 +60,7 @@ def _plt_monthly_and_20ma_ic(data, axs, data_name, color_bounds):
     origin_columns = data.columns
     markersize = 5
 
-    data_month = data.resample("M").mean()
+    data_month = data.resample("ME").mean()
     summarized_data = _summarize_ic_data(data)
 
     for i_p, col in enumerate(origin_columns):
@@ -322,7 +322,7 @@ def plt_quantile_cumulative_returns(quantile_returns: QuantileReturns, factor_na
     plot_recent, loc = _can_plot_recent(next(iter(quantile_returns.values())))
 
     fig, axs = plt.subplots(len(periods), 1 + plot_recent, figsize=(10 + (3 * plot_recent), 7 * len(periods)))
-    for (period, period_quantile_returns), ax in zip(quantile_returns, axs):
+    for (period, period_quantile_returns), ax in zip(quantile_returns.items(), axs):
         if plot_recent:
             ax1, ax2 = ax
         else:
