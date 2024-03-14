@@ -1,4 +1,5 @@
 import click
+import os
 from ..common.config import logger
 
 @click.group()
@@ -10,11 +11,31 @@ def cli():
 def help():
     click.echo('Help')
 
+# TODO: Add more data source
 @click.command(help="Download data")
 def download():
-    logger.warning('Not implemented yet! Need setup a file sever for file download.')
-    click.echo('Downloading data ...')
+    logger.info('Preparing Data for the first time ...')
+    # Check if gz file is exist
+    raw_data_path = os.path.join(os.path.dirname(__file__), '../data/raw/AStockData.tar.gz')
+    if os.path.exists(raw_data_path):
+        logger.info('Data is already downloaded. Skip downloading.')
+    else:
+        logger.infoo('Downloading data ...')
+        # Download data from file server
+        request_url = 'https://firequant.oss-ap-southeast-1.aliyuncs.com/AStockData.tar.gz'
+        try:
+            os.system(f'wget {request_url} -O {raw_data_path}')
+        except Exception as e:
+            logger.error(f"Failed to download file: {e}")
 
+    # tar unzip file, print progress
+    try:
+        os.system(f'tar -xvf {raw_data_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1')
+    except Exception as e:
+        logger.error(f"Failed to unzip file: {e}")
+    
+    logger.info('Data is downloaded and saved to local storage. Done.!!')
+    
 
 
 cli.add_command(help)

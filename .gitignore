@@ -161,6 +161,8 @@ cython_debug/
 
 # feather datafiles
 *.feather
+# gzip datafiles
+*.gz
 
 # vscode
 .vscode/
