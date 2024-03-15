@@ -15,6 +15,14 @@ def help():
 @click.command(help="Download data")
 def download():
     logger.info('Preparing Data for the first time ...')
+    # check if data directory is exist
+    data_dir = os.path.join(os.path.dirname(__file__), '../data/raw')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+        logger.info('Data directory is created.')
+    else:
+        logger.info('Data directory is already exist. Skip creating directory.')
+
     # Check if gz file is exist
     raw_data_path = os.path.join(os.path.dirname(__file__), '../data/raw/AStockData.tar.gz')
     if os.path.exists(raw_data_path):
@@ -40,6 +48,12 @@ def download():
 @click.argument('file_path', type=click.Path(exists=True))
 def load(file_path: str = None):
     logger.info('Preparing Data for the first time ...')
+    data_dir = os.path.join(os.path.dirname(__file__), '../data/raw')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+        logger.info('Data directory is created.')
+    else:
+        logger.info('Data directory is already exist. Skip creating directory.')
     # tar unzip file, print progress
     try:
         os.system(f'tar -xvf {file_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1')
