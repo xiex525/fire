@@ -10,7 +10,7 @@ name = "navi_quant"
 version = "0.1.0"
 description = "The bundled opensource toolkit for book Navigate through the Factor Zoo: The Science of Factor Investing."
 readme = "README.md"
-authors = [{name = "Renjie Liao", email = "liao.renjie@qq.com"}, {name="Baoche Qiao", email="baochenqiao@gmail.com"}]
+authors = [{name = "Renjie Liao", email = "auderson@qq.com"}, {name="Baochen Qiao", email="baochenqiao@gmail.com"}]
 dependencies = [
     "click >= 8.1.3",
 ]
