@@ -1,6 +1,5 @@
 import click
 import os
-import requests
 from ..common.config import logger
 
 @click.group()
@@ -37,7 +36,18 @@ def download():
     
     logger.info('Data is downloaded and saved to local storage. Done.!!')
     
+@click.command(help="Prepare data")
+@click.argument('file_path', type=click.Path(exists=True))
+def load(file_path: str = None):
+    logger.info('Preparing Data for the first time ...')
+    # tar unzip file, print progress
+    try:
+        os.system(f'tar -xvf {file_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1')
+    except Exception as e:
+        logger.error(f"Failed to unzip file: {e}")
+
 
 
 cli.add_command(help)
 cli.add_command(download)
+cli.add_command(load)
