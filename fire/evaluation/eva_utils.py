@@ -61,6 +61,7 @@ def compute_ic(
         a dataframe of IC values for each period in columns.
 
     """
+    factor = factor[np.isfinite(factor)]
     return IC(
         pd.DataFrame(
             {
@@ -91,9 +92,9 @@ def factor_to_quantile(factor: pd.DataFrame, quantiles: int = 5) -> pd.DataFrame
     quantile_values = np.arange(1, quantiles + 1)
 
     def _row_to_quantile(row):
-        not_na = row.notna()
-        if not_na.any():
-            tmp: pd.Series = pd.qcut(row[not_na], quantiles, labels=False, duplicates="drop")
+        finite = np.isfinite(row)
+        if finite.any():
+            tmp: pd.Series = pd.qcut(row[finite], quantiles, labels=False, duplicates="drop")
             # rearrange values from `q` to 1
             # this makes sure that the quantile values are generally continuous,
             # and we always have a group of long portfolio of `q`
@@ -103,7 +104,7 @@ def factor_to_quantile(factor: pd.DataFrame, quantiles: int = 5) -> pd.DataFrame
             if not np.array_equal(old_values, new_values):
                 tmp.replace(old_values, new_values, inplace=True)
             row = row.copy()
-            row[not_na] = tmp
+            row[finite] = tmp
             return row
         else:
             return row

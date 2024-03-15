@@ -22,6 +22,9 @@ __all__ = [
 ]
 
 
+sns.set_style("whitegrid")
+
+
 def _plt_cumsum_ic(summarized_data, ax, factor_name, data_name):
     y_mean = summarized_data.resample("YE", label="left").mean()
     for c, sr in y_mean.T.iterrows():
@@ -322,22 +325,22 @@ def plt_quantile_cumulative_returns(quantile_returns: QuantileReturns, factor_na
     plot_recent, loc = _can_plot_recent(next(iter(quantile_returns.values())))
 
     fig, axs = plt.subplots(len(periods), 1 + plot_recent, figsize=(10 + (3 * plot_recent), 7 * len(periods)))
-    for (period, period_quantile_returns), ax in zip(quantile_returns.items(), axs):
+    for (period, period_cum_returns), ax in zip(cum_returns.items(), axs):
         if plot_recent:
             ax1, ax2 = ax
         else:
             ax1, ax2 = ax, NotImplemented
 
         plt_cumulative_returns(
-            daily_cum_returns=period_quantile_returns,
+            daily_cum_returns=period_cum_returns,
             ax=ax1,
             show_min_max=True,
             title=f"{factor_name} ({period} Fwd Period)",
             show=False,
         )
         if plot_recent:
-            recent_data = period_quantile_returns.loc[loc:] + 1
-            recent_data = recent_data.pct_change().add(1).cumprod().sub(1)
+            recent_data = period_cum_returns.loc[loc:] + 1
+            recent_data = recent_data.pct_change(fill_method=None).add(1).cumprod().sub(1)
             plt_cumulative_returns(
                 daily_cum_returns=recent_data,
                 ax=ax2,
