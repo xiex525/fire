@@ -16,11 +16,11 @@ Download the data from [here](https://github.com/auderson/FactorInvestmentResear
 run the command and download data put in correct path automatically.
 ```bash
 # Auto download data
-navi download
+fire download
 ```
 if you have already downloaded the data, you can run the command to check the data and put the data in the correct path 
 ```bash
-navi load path_to_data.tar.gz
+fire load path_to_data.tar.gz
 ```
 
 
