@@ -1,5 +1,6 @@
 import click
 import os
+import requests
 from ..common.config import logger
 
 @click.group()
@@ -22,7 +23,7 @@ def download():
     else:
         logger.infoo('Downloading data ...')
         # Download data from file server
-        request_url = 'https://firequant.oss-ap-southeast-1.aliyuncs.com/AStockData.tar.gz'
+        request_url = 'https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz'
         try:
             os.system(f'wget {request_url} -O {raw_data_path}')
         except Exception as e:
