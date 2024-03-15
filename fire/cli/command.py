@@ -1,6 +1,12 @@
-import click
+# Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
+# For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
+
 import os
+
+import click
+
 from ..common.config import logger
+
 
 @click.group()
 def cli():

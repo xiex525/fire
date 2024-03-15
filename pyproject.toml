@@ -6,7 +6,7 @@ requires = ["setuptools>=65.5.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "navi_quant"
+name = "fire"
 version = "0.1.0"
 description = "The bundled opensource toolkit for book Navigate through the Factor Zoo: The Science of Factor Investing."
 readme = "README.md"
@@ -16,4 +16,4 @@ dependencies = [
 ]
 
 [project.scripts]
-navi = "navi_quant.cli.command:cli"
+navi = "fire.cli.command:cli"

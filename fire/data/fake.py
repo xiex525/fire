@@ -1,8 +1,12 @@
-import typing
-import pandas as pd
-import numpy as np
+# Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
+# For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
 
+import typing
 from functools import partial
+
+import numpy as np
+import pandas as pd
+
 from ..common.const import MIN_BARTIMES
 
 IndexType = typing.Literal["d", "day", "m", "min", "minute", "l1", "l2"]

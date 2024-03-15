@@ -1,6 +1,11 @@
-from typing import List, Tuple
-import pandas as pd
+# Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
+# For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
+
 import os
+from typing import List, Tuple
+
+import pandas as pd
+
 
 def load_data_maps() -> List[str]:
     return {

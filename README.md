@@ -1,10 +1,10 @@
-# NaviQuant
+# F.I.R.E.
 
 This repo is the bundled opensource toolkit for book _Navigate through the Factor Zoo: The Science of Factor Investing_.
 
 ## Installation
 ```bash
-pip install naviquant
+pip install fire
 
 # for loacl testing
 pip install -e .
@@ -20,17 +20,17 @@ navi download
 
 start to code
 ```python
-import naviquant as nq
+import fire
 
 # get data
-close = nq.fetch_data('close')['close']
-open = nq.fetch_data('open')['open']
+close = fire.fetch_data('close')['close']
+open = fire.fetch_data('open')['open']
 
 # compute forward returns
-fr = nq.compute_forward_returns(open, [1, 5, 10])
+fr = fire.compute_forward_returns(open, [1, 5, 10])
 
 # evaluate factor
-mng = nq.Evaluator(factor, fr)
+mng = fire.Evaluator(factor, fr)
 mng.get_ic("pearson")
 mng.get_quantile_returns(5)
 

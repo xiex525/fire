@@ -1,11 +1,13 @@
-import pandas as pd
+# Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
+# For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
+
 import numpy as np
+import pandas as pd
 
-from ..common.config import logger
-from .fake import gen_df
 from .datainfo import load_data_maps, load_AStock_info
-
+from .fake import gen_df
 from .file_reader import file_reader
+from ..common.config import logger
 
 ALL_DATA_NAMES = load_data_maps()
 
