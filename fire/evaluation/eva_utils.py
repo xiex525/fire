@@ -94,13 +94,17 @@ def factor_to_quantile(factor: pd.DataFrame, quantiles: int = 5) -> pd.DataFrame
         not_na = row.notna()
         if not_na.any():
             tmp: pd.Series = pd.qcut(row[not_na], quantiles, labels=False, duplicates="drop")
-            # re arange values from q to 1
+            # rearrange values from `q` to 1
+            # this makes sure that the quantile values are generally continuous,
+            # and we always have a group of long portfolio of `q`
             old_values = tmp.unique()
             old_values.sort()
             new_values = quantile_values[-len(old_values) :]
             if not np.array_equal(old_values, new_values):
                 tmp.replace(old_values, new_values, inplace=True)
-            return tmp
+            row = row.copy()
+            row[not_na] = tmp
+            return row
         else:
             return row
 

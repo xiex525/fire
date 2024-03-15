@@ -31,7 +31,7 @@ close = fire.fetch_data('close')['close']
 open = fire.fetch_data('open')['open']
 
 # compute forward returns
-fr = fire.compute_forward_returns(open, [1, 5, 10])
+fr = fire.compute_forward_returns(open.shift(-1), [1, 5, 10])
 
 # evaluate factor
 mng = fire.Evaluator(factor, fr)
