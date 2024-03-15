@@ -16,17 +16,27 @@ def cli():
 def help():
     click.echo("Help")
 
+def _prepare_folder():
+    # check if data directory exists
+    data_dir = os.path.join(os.path.dirname(__file__), "../data/raw")
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+        logger.info("Data directory is created.")
+    else:
+        logger.info("Data directory already exists. Skipping creating directory.")
 
 # TODO: Add more data source
 @click.command(help="Download data")
 def download():
     logger.info("Preparing Data for the first time ...")
+    _prepare_folder()
+
     # Check if gz file is exist
     raw_data_path = os.path.join(os.path.dirname(__file__), "../data/raw/AStockData.tar.gz")
     if os.path.exists(raw_data_path):
         logger.info("Data is already downloaded. Skip downloading.")
     else:
-        logger.infoo("Downloading data ...")
+        logger.info("Downloading data ...")
         # Download data from file server
         request_url = (
             "https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz"
@@ -44,13 +54,15 @@ def download():
     except Exception as e:
         logger.error(f"Failed to unzip file: {e}")
 
-    logger.info("Data is downloaded and saved to local storage. Done.!!")
+    logger.info("Data is downloaded and saved to local storage. Done!!")
 
 
 @click.command(help="Prepare data")
 @click.argument("file_path", type=click.Path(exists=True))
 def load(file_path: str = None):
     logger.info("Preparing Data for the first time ...")
+    _prepare_folder()
+
     # tar unzip file, print progress
     try:
         os.system(
