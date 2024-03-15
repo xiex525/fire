@@ -6,7 +6,7 @@ import rd
 
 
 factor = rd.gen_df(100, 20)
-price = rd.gen_df(100, 20, mock='price')
+price = rd.gen_df(100, 20, mock="price")
 
 fr = fire.compute_forward_returns(price, [1, 5, 10])
 

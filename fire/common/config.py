@@ -4,6 +4,6 @@
 import configparser
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read("config.ini")
 
-DATA_PATH = config.get(section='data', option="DATA_PATH", fallback='data')
+DATA_PATH = config.get(section="data", option="DATA_PATH", fallback="data")

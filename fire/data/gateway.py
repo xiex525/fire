@@ -3,13 +3,14 @@
 
 import numpy as np
 import pandas as pd
+from loguru import logger
 
 from .datainfo import load_data_maps, load_AStock_info
 from .fake import gen_df
 from .file_reader import file_reader
-from ..common.config import logger
 
 ALL_DATA_NAMES = load_data_maps()
+
 
 def _get_clean_names(names) -> list:
     output = []
@@ -28,6 +29,7 @@ def _get_clean_names(names) -> list:
             for _name in name:
                 _add_from_str(_name)
     return output
+
 
 def _get_clean_se(start=None, end=None, dates=None):
     """basic checks, no transformation for input ts"""
@@ -51,6 +53,7 @@ def _get_clean_se(start=None, end=None, dates=None):
             start, end = dates[0], dates[-1]
 
     return start, end
+
 
 def _parse_args(names, start_date, end_date, dates):
     """
@@ -108,8 +111,10 @@ def _parse_args(names, start_date, end_date, dates):
 
     return _get_clean_names(names), start_date, end_date
 
+
 def check_if_valid(names: list[str]) -> dict[str, bool]:
     return {n: n in ALL_DATA_NAMES for n in names}
+
 
 def fetch_data(
     *args,
@@ -119,13 +124,11 @@ def fetch_data(
     dates=None,
     market_range="ALL",
 ) -> dict[str, pd.DataFrame]:
-    
-
     if names is None:
         names = args
     elif args:
         raise ValueError("you may only use `names` or `*args` to specify the data to be queried")
-    
+
     names, start_date, end_date = _parse_args(names, start_date, end_date, dates)
 
     results = {}
@@ -133,12 +136,12 @@ def fetch_data(
         return results
 
     valid = check_if_valid(names)
-    
+
     columns, index = load_AStock_info()
     for k, v in valid.items():
         if not v:
             logger.warning(f"{k} is not a valid data name, mock with random data")
-            results[k] = gen_df((len(index),len(columns)))
+            results[k] = gen_df((len(index), len(columns)))
             names.remove(k)
 
     # only support file reader for now
@@ -150,7 +153,7 @@ def fetch_data(
         except Exception as e:
             logger.error(f"cannot find data source for {name}, reason: {e}")
             continue
-        
+
         if l == "file":
             if r not in file_reader_names:
                 file_reader_names[r] = [name]
@@ -158,7 +161,7 @@ def fetch_data(
                 file_reader_names[r].append(name)
         else:
             raise ValueError(f"{name} unsupported data source: {l}::{r}")
-    
+
     # only support file reader for now
     results.update(file_reader(file_reader_names))
     return results

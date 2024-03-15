@@ -12,12 +12,15 @@ from ..common.const import MIN_BARTIMES
 IndexType = typing.Literal["d", "day", "m", "min", "minute", "l1", "l2"]
 MockType = typing.Literal["rand", "norm", "price", "volume", "return", "arange"]
 
+
 def _get_l2_seconds():
     morning = pd.timedelta_range("09:15:00", "11:30:00", freq="3 s")
     afternoon = pd.timedelta_range("13:00:00", "15:30:00", freq="3 s")
     return morning.union(afternoon)
 
+
 l2_seconds = _get_l2_seconds()
+
 
 def _index_maker(n, index_type: IndexType = "day"):
     if index_type in ("d", "day"):
@@ -68,6 +71,7 @@ def _nb_random(shape, mock):
             total *= s
         return np.arange(total, dtype=np.float64).reshape(shape)
 
+
 def _value_maker(shape, fill_value=np.nan, mock: MockType = "rand"):
     if fill_value is np.nan:
         if mock in MockType.__args__:
@@ -76,6 +80,7 @@ def _value_maker(shape, fill_value=np.nan, mock: MockType = "rand"):
             raise ValueError(f"mock {mock} not implemented")
     else:
         return np.full(shape, fill_value)
+
 
 def _generate_stock_code(i):
     c = f"{i:06}."
@@ -87,6 +92,7 @@ def _generate_stock_code(i):
     else:
         c += "SH"
     return c
+
 
 def _columns_maker(n):
     return pd.Index(sorted(map(_generate_stock_code, range(n))), name="stock_code")
@@ -109,6 +115,6 @@ def gen_df(*shape, fill_value=np.nan, index: IndexType = "day", mock: MockType =
         idx_col = {"index": index_maker(shape[0]), "columns": _columns_maker(shape[1])}
     else:
         raise NotImplementedError(f"shape {shape} not implemented")
-    
+
     out = container(value_maker(shape), **idx_col)
     return out

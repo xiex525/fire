@@ -3,6 +3,7 @@
 This repo is the bundled opensource toolkit for book _Navigate through the Factor Zoo: The Science of Factor Investing_.
 
 ## Installation
+
 ```bash
 pip install fire
 
@@ -11,14 +12,17 @@ pip install -e .
 ```
 
 ## Usage
+
 Download the data from [here](https://pan.baidu.com/s/1eS3Z3Y8) with password `3z3y`.(瞎写的，暂时没有)
 
 run the command and download data put in correct path automatically.
+
 ```bash
 navi download
 ```
 
 start to code
+
 ```python
 import fire
 
@@ -37,6 +41,7 @@ mng.get_quantile_returns(5)
 ```
 
 ## Features
+
 1. handy functions for fast factor computation
 2. various tools for factor evaluation
 
