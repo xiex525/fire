@@ -13,7 +13,8 @@ pip install -e .
 
 ## Usage
 
-Download the data from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz)
+Download the data 
+from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz)
 
 run the command and download data put in correct path automatically.
 
@@ -21,11 +22,12 @@ run the command and download data put in correct path automatically.
 # Auto download data
 fire download
 ```
-if you have already downloaded the data, you can run the command to check the data and put the data in the correct path 
+
+if you have already downloaded the data, you can run the command to check the data and put the data in the correct path
+
 ```bash
 fire load path_to_data.tar.gz
 ```
-
 
 start to code
 
@@ -40,6 +42,7 @@ open_price = data["open"]
 def pv_corr(close, volume):
     # price volume correlation
     return close.rolling(20).corr(volume)
+
 
 factor = pv_corr(data["close"], data["volume"])
 
