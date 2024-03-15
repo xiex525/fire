@@ -13,13 +13,19 @@ pip install -e .
 
 ## Usage
 
-Download the data from [here](https://pan.baidu.com/s/1eS3Z3Y8) with password `3z3y`.(瞎写的，暂时没有)
+Download the data from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz)
 
 run the command and download data put in correct path automatically.
 
 ```bash
-navi download
+# Auto download data
+fire download
 ```
+if you have already downloaded the data, you can run the command to check the data and put the data in the correct path 
+```bash
+fire load path_to_data.tar.gz
+```
+
 
 start to code
 

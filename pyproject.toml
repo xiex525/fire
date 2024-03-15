@@ -16,4 +16,4 @@ dependencies = [
 ]
 
 [project.scripts]
-navi = "fire.cli.command:cli"
+fire = "fire.cli.command:cli"
