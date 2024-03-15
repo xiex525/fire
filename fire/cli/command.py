@@ -16,6 +16,7 @@ def cli():
 def help():
     click.echo("Help")
 
+
 def _prepare_folder():
     # check if data directory exists
     data_dir = os.path.join(os.path.dirname(__file__), "../data/raw")
@@ -24,6 +25,7 @@ def _prepare_folder():
         logger.info("Data directory is created.")
     else:
         logger.info("Data directory already exists. Skipping creating directory.")
+
 
 # TODO: Add more data source
 @click.command(help="Download data")
