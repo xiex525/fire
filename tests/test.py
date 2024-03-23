@@ -2,13 +2,19 @@
 # For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
 
 import fire
-import rd
 
 
-factor = rd.gen_df(100, 20)
-price = rd.gen_df(100, 20, mock="price")
+data = fire.fetch_data("close", "volume", "open")
 
-fr = fire.compute_forward_returns(price, [1, 5, 10])
+
+def pv_corr(close, volume):
+    return fire.ts_corr(close, volume, 5, method="pearson")
+
+
+factor = pv_corr(data["close"], data["volume"])
+
+
+fr = fire.compute_forward_returns(data["open"].shift(-1), [1, 5, 10])
 
 mng = fire.Evaluator(factor, fr)
 mng.get_ic("pearson")
