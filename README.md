@@ -5,9 +5,13 @@ This repo is the bundled opensource toolkit for book _Navigate through the Facto
 ## Installation
 
 ```bash
+# We have not released the package to pypi yet, so you need to install from source!!!
 pip install fire
 
-# for loacl testing
+# Install from source for loacl testing!!!
+## replace $ThisRepoURL with the actual repo url
+git clone $ThisRepoURL 
+## install from source
 pip install -e .
 ```
 
@@ -19,17 +23,19 @@ from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/
 run the command and download data put in correct path automatically.
 
 ```bash
+# We have not released this repo yet, so you need download the data manually!!! See command below!!!
 # Auto download data
 fire download
 ```
 
-if you have already downloaded the data, you can run the command to check the data and put the data in the correct path
+If you have already downloaded the data from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz), you can run the command to check the data and put the data in the correct path
 
 ```bash
+# replace path_to_data.tar.gz with the actual path
 fire load path_to_data.tar.gz
 ```
 
-start to code
+## Start to code
 
 ```python
 import fire

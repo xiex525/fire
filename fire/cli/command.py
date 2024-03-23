@@ -36,25 +36,21 @@ def download():
     # Check if gz file is exist
     raw_data_path = os.path.join(os.path.dirname(__file__), "../data/raw/AStockData.tar.gz")
     if os.path.exists(raw_data_path):
-        logger.info("Data is already downloaded. Skip downloading.")
+        logger.info("Data already exists, Remove Data First...")
+        os.remove(raw_data_path)
     else:
         logger.info("Downloading data ...")
         # Download data from file server
         request_url = (
             "https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz"
         )
-        try:
-            os.system(f"wget {request_url} -O {raw_data_path}")
-        except Exception as e:
-            logger.error(f"Failed to download file: {e}")
 
-    # tar unzip file, print progress
-    try:
-        os.system(
-            f'tar -xvf {raw_data_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1'
-        )
-    except Exception as e:
-        logger.error(f"Failed to unzip file: {e}")
+        os.system(f"wget {request_url} -O {raw_data_path}")
+        os.system(f'tar -xvf {raw_data_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1')
+
+        data_file = os.path.join(os.path.dirname(__file__), "../data/raw/close.feather")
+        if not os.path.exists(data_file):
+            raise Exception(f"Failed to download data, If you are behind a proxy, please set it up. or download the data manually from {request_url} and run fire load <file_path> to load the data.")
 
     logger.info("Data is downloaded and saved to local storage. Done!!")
 
