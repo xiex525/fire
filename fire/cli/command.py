@@ -1,5 +1,5 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
-# For details: https://github.com/auderson/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
+# For details: https://github.com/fire-institute/FactorInvestmentResearchEngine/blob/master/NOTICE.txt
 
 import os
 
@@ -42,7 +42,7 @@ def download():
         logger.info("Downloading data ...")
         # Download data from file server
         request_url = (
-            "https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz"
+            "https://github.com/fire-institute/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz"
         )
 
         os.system(f"wget {request_url} -O {raw_data_path}")

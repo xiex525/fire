@@ -18,7 +18,7 @@ pip install -e .
 ## Usage
 
 Download the data 
-from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz)
+from [here](https://github.com/fire-institute/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz)
 
 run the command and download data put in correct path automatically.
 
@@ -28,7 +28,7 @@ run the command and download data put in correct path automatically.
 fire download
 ```
 
-If you have already downloaded the data from [here](https://github.com/auderson/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz), you can run the command to check the data and put the data in the correct path
+If you have already downloaded the data from [here](https://github.com/fire-institute/FactorInvestmentResearchEngine/releases/download/marketdata/AStockData.tar.gz), you can run the command to check the data and put the data in the correct path
 
 ```bash
 # replace path_to_data.tar.gz with the actual path
