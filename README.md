@@ -1,6 +1,6 @@
 # F.I.R.E. Factor Investment Research Engine
 
-This repo is the bundled opensource toolkit for book _Navigate through the Factor Zoo: The Science of Factor Investing_.
+This repo is the bundled opensource toolkit for book _Navigating the Factor Zoo：The Science of Quantitative Investing_.
 
 ## Installation
 
