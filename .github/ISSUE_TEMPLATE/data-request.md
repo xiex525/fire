@@ -1,5 +1,5 @@
 ---
-name: Data Request
+name: Data request
 about: Request a new Data
 title: NEW DATA REQUEST
 labels: new data
