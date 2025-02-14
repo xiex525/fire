@@ -3,7 +3,7 @@
 
 import pandas as pd
 import typing
-from . import _numba_funcs
+from ..core.algorithm import _numba_funcs
 
 __all__ = ["ts_corr"]
 
