@@ -36,11 +36,11 @@ nav_order: 2
 
 | Feature Name | Status | Owner |
 | ------------ | ------ | ----- |
-| Consensus Factor Models: CAPM, FF3, FF3+Mom, FF3+MOM+LIQ, FF5 | Developing | @feathertop @mitcshi |
-| Portfolio Sort | Developing | @feathertop @mitcshi |
-| Double sorting | Developing | @feathertop @mitcshi |
-| Fama-MacBeth Regression | Developing | @feathertop @mitcshi |
-| Testing Anomalies (Time-Series Regression) | Developing | @feathertop @mitcshi |
-| GRS Test | Developing | @feathertop @mitcshi |
-| Support More Algorithms | Developing | @qiaobaochen |
-| Project CI/CD | Developing | @qiaobaochen |
+| Consensus Factor Models: CAPM, FF3, FF3+Mom, FF3+MOM+LIQ, FF5 | Developing | [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi) |
+| Portfolio Sort | Developing | [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi)  |
+| Double sorting | Developing | [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi) |
+| Fama-MacBeth Regression | Developing |  [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi)  |
+| Testing Anomalies (Time-Series Regression) | Developing | [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi) hi |
+| GRS Test | Developing |  [@feathertop](https://github.com/feathertop) [@mitcshi](https://github.com/mitcshi)  |
+| Support More Algorithms | Developing | [@qiaobaochen](https://github.com/qiaobaochen) |
+| Project CI/CD | Developing | [@qiaobaochen](https://github.com/qiaobaochen)|
