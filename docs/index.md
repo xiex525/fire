@@ -3,34 +3,80 @@ title: Home
 layout: home
 nav_order: 1
 ---
+# F.I.R.E. Factor Investment Research Engine
 
-This is a *bare-minimum* template to create a Jekyll site that uses the [Just the Docs] theme. You can easily set the created site to be published on [GitHub Pages] – the [README] file explains how to do that, along with other details.
+This project is the bundled opensource toolkit for book _Navigating the Factor Zoo：The Science of Quantitative Investing_. 
 
-If [Jekyll] is installed on your computer, you can also build and preview the created site *locally*. This lets you test changes before committing them, and avoids waiting for GitHub Pages.[^1] And you will be able to deploy your local build to a different platform than GitHub Pages.
+The Fire project serves as a development and evaluation toolkit for factor research and portfolio construction. It is designed specifically to be simple, easy to use, and built on top of popular Python libraries like pandas, numpy, and scikit-learn.
 
-More specifically, the created site:
+Fire focuses on three critical aspects of factor research and portfolio construction:
 
-- uses a gem-based approach, i.e. uses a `Gemfile` and loads the `just-the-docs` gem
-- uses the [GitHub Pages / Actions workflow] to build and publish the site on GitHub Pages
+1. **Data Management**: Fire provides a user-friendly interface for downloading and managing financial data. By leveraging the pre-cleaned and processed data pipeline from the Fire Institute, you can focus more on research and modeling rather than data preparation.
 
-Other than that, you're free to customize sites that you create with this template, however you like. You can easily change the versions of `just-the-docs` and Jekyll it uses, as well as adding further plugins.
+2. **Construction (Calculation)**: Fire offers a variety of algorithms for factor construction. Additionally, it allows users to build their own factors using popular libraries such as pandas, numpy, and scikit-learn.
 
-[Browse our documentation][Just the Docs] to learn more about how to use this theme.
-
-To get started with creating a site, simply:
-
-1. click "[use this template]" to create a GitHub repository
-2. go to Settings > Pages > Build and deployment > Source, and select GitHub Actions
-
-If you want to maintain your docs in the `docs` directory of an existing project repo, see [Hosting your docs from an existing project repo](https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md#hosting-your-docs-from-an-existing-project-repo) in the template README.
+3. **Evaluation**: Factor evaluation is a complex and crucial step in research. Fire provides a comprehensive set of tools to assess factor performance, bridging the gap between academic and industry evaluation practices.
 
 ----
 
-[^1]: [It can take up to 10 minutes for changes to your site to publish after you push the changes to GitHub](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll#creating-your-site).
+## Quick Start
 
-[Just the Docs]: https://just-the-docs.github.io/just-the-docs/
-[GitHub Pages]: https://docs.github.com/en/pages
-[README]: https://github.com/just-the-docs/just-the-docs-template/blob/main/README.md
-[Jekyll]: https://jekyllrb.com
-[GitHub Pages / Actions workflow]: https://github.blog/changelog/2022-07-27-github-pages-custom-github-actions-workflows-beta/
-[use this template]: https://github.com/just-the-docs/just-the-docs-template/generate
+## Installation
+
+```bash
+# We have not released the package to pypi yet, so you need to install from source!!!
+pip install fire
+
+# Install from source for loacl testing!!!
+## replace $ThisRepoURL with the actual repo url
+git clone $ThisRepoURL 
+## install from source
+pip install -e .
+```
+
+## Usage
+
+Download the data 
+from [here](https://github.com/fire-institute/fire/releases/download/marketdata/AStockData.tar.gz)
+
+run the command and download data put in correct path automatically.
+
+```bash
+# We have not released this repo yet, so you need download the data manually!!! See command below!!!
+# Auto download data
+fire download
+```
+
+If you have already downloaded the data from [here](https://github.com/fire-institute/fire/releases/download/marketdata/AStockData.tar.gz), you can run the command to check the data and put the data in the correct path
+
+```bash
+# replace path_to_data.tar.gz with the actual path
+fire load path_to_data.tar.gz
+```
+
+## Start to code
+
+```python
+import fire
+
+# get data
+data = fire.fetch_data(["open", "close", "volume"])
+open_price = data["open"]
+
+
+def pv_corr(close, volume):
+    # price volume correlation
+    return close.rolling(20).corr(volume)
+
+
+factor = pv_corr(data["close"], data["volume"])
+
+# compute forward returns
+fr = fire.compute_forward_returns(open_price.shift(-1), [1, 5, 10])
+
+# evaluate factor
+mng = fire.Evaluator(factor, fr)
+mng.get_ic("pearson")
+mng.get_quantile_returns(5)
+
+```
