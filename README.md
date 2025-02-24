@@ -6,7 +6,6 @@ This repo is the bundled opensource toolkit for book _Navigating the Factor Zooï
 
 ```bash
 # We have not released the package to pypi yet, so you need to install from source!!!
-pip install fire
 
 # Install from source for loacl testing!!!
 ## replace $ThisRepoURL with the actual repo url
