@@ -1,4 +1,4 @@
-# Fama-MacBeth Regression Implementation
+# Fama-MacBeth Regression
 
 ## Overview
 This Python script implements the **Fama-MacBeth** regression procedure, which is commonly used in asset pricing models. The method evaluates the risk premia for different factors by performing a time-series of cross-sectional regressions on asset returns. The script uses the **LinearRegression** from scikit-learn to run the regressions.
