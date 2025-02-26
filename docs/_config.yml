@@ -1,0 +1,10 @@
+title: F.I.R.E.
+description: Factor Investment Research Engine (The bundled opensource toolkit for book Navigating the Factor Zoo：The Science of Quantitative Investing.)
+theme: just-the-docs
+
+url: fire-institute.github.io
+
+aux_links:
+  F.I.R.E. on GitHub: https://github.com/fire-institute/fire
+
+color_scheme: dark
