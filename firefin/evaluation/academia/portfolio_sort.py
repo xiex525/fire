@@ -27,27 +27,19 @@ class PortfolioSort:
         forward_returns: ForwardReturns,
         market_cap: pd.DataFrame,
         quantiles: int,
-        min_assets: int = 10,
         value_weighted: bool = True,
-        get_series: bool = False,
         get_quantile_sorts: bool = False,
-        get_tstat: bool = False,
-        char_lag: int = -1,
     ) -> typing.Union[pd.DataFrame, np.ndarray]:
         """
         Perform single portfolio sort based on characteristic and create long-short portfolio.
         
         Args:
-            factor: TxN DataFrame of characteristic exposures
-            forward_returns: TxN DataFrame of returns
-            market_cap: TxN DataFrame of market capitalizations
+            factor: (Time x Stock) DataFrame of characteristic exposures
+            forward_returns: period : (Time x Stock) DataFrame of returns
+            market_cap: (Time x Stock) DataFrame of market capitalizations
             quantiles: number of quantiles
-            min_assets: Minimum required assets per portfolio
             value_weighted: Use market cap weighting (True) or equal weighting (False)
-            get_series: Return time series instead of averages
             get_quantile_sorts: Return portfolio assignments
-            get_tstat: Return t-statistics instead of p-values
-            char_lag: Lag between characteristic and return calculation
         Returns:
             Portfolio returns and statistical results
         """
