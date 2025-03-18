@@ -1,6 +1,8 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/fire-institute/fire/blob/master/NOTICE.txt
 
+# TODO: Move some common algorithms to fire/core/algorithm/
+
 import typing
 
 import numpy as np
@@ -121,6 +123,15 @@ def _compute_quantile_df_df(qt: pd.DataFrame, fr: pd.DataFrame, quantiles: int =
     result = result.reindex(columns=np.arange(1, quantiles + 1), copy=False)
     return result
 
+def _compute_weighted_quantile_df(qt: pd.DataFrame, fr: pd.DataFrame, wt: pd.DataFrame, quantiles: int = 5):
+    # assume aligned
+    result = {}
+    for (dt, fr_row), (_, qt_row), (_, wt_row) in zip(fr.iterrows(), qt.iterrows(), wt.iterrows()):
+        _wt_row = wt_row.groupby(qt_row).transform(lambda x: x / x.sum())
+        result[dt] = (fr_row * _wt_row).groupby(qt_row).sum()
+    result = pd.DataFrame(result).T
+    result = result.reindex(columns=np.arange(1, quantiles + 1), copy=False)
+    return result
 
 def compute_quantile_returns(
     factor: pd.DataFrame, forward_returns: ForwardReturns, quantiles: int = 5
