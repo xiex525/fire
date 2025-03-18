@@ -41,10 +41,10 @@ fire load path_to_data.tar.gz
 ## Start to code
 
 ```python
-import fire
+import firefin
 
 # get data
-data = fire.fetch_data(["open", "close", "volume"])
+data = firefin.fetch_data(["open", "close", "volume"])
 open_price = data["open"]
 
 
@@ -56,10 +56,10 @@ def pv_corr(close, volume):
 factor = pv_corr(data["close"], data["volume"])
 
 # compute forward returns
-fr = fire.compute_forward_returns(open_price.shift(-1), [1, 5, 10])
+fr = firefin.compute_forward_returns(open_price.shift(-1), [1, 5, 10])
 
 # evaluate factor
-mng = fire.Evaluator(factor, fr)
+mng = firefin.Evaluator(factor, fr)
 mng.get_ic("pearson")
 mng.get_quantile_returns(5)
 
