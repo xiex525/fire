@@ -77,6 +77,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+develop.ipynb
 
 # IPython
 profile_default/
@@ -169,3 +170,4 @@ cython_debug/
 
 # data packages
 AStockData.tar.gz
+.gitignore
