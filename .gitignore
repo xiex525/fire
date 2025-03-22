@@ -170,4 +170,3 @@ cython_debug/
 
 # data packages
 AStockData.tar.gz
-.gitignore
