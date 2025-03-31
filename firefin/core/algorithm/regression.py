@@ -156,6 +156,7 @@ class RollingRegressor:
         else:
             raise ValueError("parsed x should be array")
 
+        # now x is 3d array: key-index-columns
         if fit_intercept:
             self.x = np.concatenate([np.ones((1, *self.x.shape[1:])), self.x])
 
@@ -278,13 +279,13 @@ class RollingRegressor:
         beta = np.full((k - fit_intercept, n, m), np.nan)
 
         for i in range(n - window + 1):
-            x = x[:, i : i + window]
-            y = y[i : i + window]
-            w = None if w is None else w[i : i + window]
+            x_wind = x[:, i : i + window]
+            y_wind = y[i : i + window]
+            w_wind = None if w is None else w[i : i + window]
             for j in range(m):
-                x_j = x[:, :, min(j, m1 - 1)].T
-                y_j = y[:, min(j, m2 - 1)]
-                w_j = None if w is None else w[:, min(j, m3 - 1)]
+                x_j = x_wind[:, :, min(j, m1 - 1)].T
+                y_j = y_wind[:, min(j, m2 - 1)]
+                w_j = None if w_wind is None else w_wind[:, min(j, m3 - 1)]
                 res = RegressionResult(
                     # fit_intercept is always False, because we've padded X in __init__
                     _regression(x_j, y_j, w_j, fit_intercept=False),
@@ -313,7 +314,15 @@ class RollingRegressor:
                 beta = pd.DataFrame(beta, index=keys, columns=columns)
             if self.is_univariate:
                 beta = beta.squeeze(axis=axis)
-
+        else:
+            alpha = pd.DataFrame(alpha, index=index, columns=columns)
+            if self.is_univariate:
+                beta = pd.DataFrame(np.squeeze(beta, axis=0), index=index, columns=columns)
+            else:
+                beta = [pd.DataFrame(beta[i], index=index, columns=columns) for i in range(k - fit_intercept)]
+                if keys is not None:
+                    for _key, _beta in zip(keys, beta):
+                        _beta.name = _key
         return BatchRegressionResult(beta, alpha=alpha)
 
 
