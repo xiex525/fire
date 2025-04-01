@@ -441,14 +441,19 @@ class RollingRegressor:
                 x_j = x_wind[:, :, min(j, m1 - 1)].T
                 y_j = y_wind[:, min(j, m2 - 1)]
                 w_j = None if w_wind is None else w_wind[:, min(j, m3 - 1)]
-                res = RegressionResult(
-                    # fit_intercept is always False, because we've padded X in __init__
-                    _regression(x_j, y_j, w_j, fit_intercept=False),
-                    fit_intercept=fit_intercept,
-                    univariate=univariate,
-                )
-                alpha[i + window - 1, j] = res.alpha
-                beta[:, i + window - 1, j] = res.beta
+                # if any x is all nan, skip regression
+                if np.isnan(x_j).all(axis=0).any() or np.isnan(y_j).all():
+                    alpha[i + window - 1, j] = np.nan
+                    beta[:, i + window - 1, j] = np.nan
+                else:
+                    res = RegressionResult(
+                        # fit_intercept is always False, because we've padded X in __init__
+                        _regression(x_j, y_j, w_j, fit_intercept=False),
+                        fit_intercept=fit_intercept,
+                        univariate=univariate,
+                    )
+                    alpha[i + window - 1, j] = res.alpha
+                    beta[:, i + window - 1, j] = res.beta
 
         # squeeze if table
         if is_table:
