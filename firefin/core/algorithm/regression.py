@@ -18,6 +18,20 @@ NotProvided = object()
 
 
 class RegressionResult:
+    """
+    Encapsulate the results from `least_square`.
+
+    Parameters
+    ----------
+    sm_result: sm.regression.linear_model.RegressionResults
+        The regression results object from the statsmodels library.
+    fit_intercept: bool
+        Whether to fit an intercept term.
+    univariate: bool
+        Whether it is a univariate regression.
+
+    """
+
     def __init__(self, sm_result: sm.regression.linear_model.RegressionResults, fit_intercept: bool, univariate: bool):
         self.sm_result = sm_result
         self.fit_intercept = fit_intercept
@@ -45,18 +59,59 @@ class RegressionResult:
 
     @property
     def r2(self):
+        """
+        Return the coefficient of determination R² of the regression.
+
+        Returns
+        -------
+        float
+            The R² value.
+        """
         return self.sm_result.rsquared
 
     @property
     def r2_adj(self):
+        """
+        Return the adjusted coefficient of determination R² of the regression.
+
+        Returns
+        -------
+        float
+            The adjusted R² value.
+        """
         return self.sm_result.rsquared_adj
 
     @property
     def residuals(self):
+        """
+        Return the residuals of the regression.
+
+        Returns
+        -------
+        array
+            The array of residuals.
+        """
         return self.sm_result.resid
 
 
 class BatchRegressionResult:
+    """
+    Encapsulate the results of batch regression.
+
+    Parameters
+    ----------
+    beta
+        The regression coefficients.
+    alpha: optional
+        The intercept term, default is None.
+    r2: optional
+        The coefficient of determination R², default is None.
+    r2_adj: optional
+        The adjusted coefficient of determination R², default is None.
+    residuals: optional
+        The residuals, default is None.
+    """
+
     def __init__(
         self,
         beta,
@@ -83,6 +138,25 @@ class BatchRegressionResult:
 def _regression(
     x: pd.DataFrame | pd.Series, y: pd.Series, w: pd.Series = None, fit_intercept: bool = True
 ) -> sm.regression.linear_model.RegressionResults:
+    """
+    Perform a linear regression using either OLS or WLS.
+
+    Parameters
+    ----------
+    x: pd.DataFrame | pd.Series
+        The independent variable(s).
+    y: pd.Series
+        The dependent variable.
+    w: pd.Series, optional
+        The weights for WLS, default is None.
+    fit_intercept: bool, optional
+        Whether to fit an intercept term, default is True.
+
+    Returns
+    -------
+    sm.regression.linear_model.RegressionResults
+        The regression results.
+    """
     if fit_intercept:
         x = sm.add_constant(x)
     if w is None:
@@ -98,8 +172,26 @@ def least_square(
     w: pd.Series | np.ndarray | None = None,
     fit_intercept: bool = True,
 ) -> RegressionResult:
-    """A simple wrapper around sm.OLS or sm.WLS"""
+    """
+    A simple wrapper around sm.OLS or sm.WLS.
 
+    Parameters
+    ----------
+    x: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The independent variable(s). If one-dimensional, the regression is considered univariate, otherwise is
+        considered multivariate. This affects the format of returned beta.
+    y: pd.Series | np.ndarray
+        The dependent variable.
+    w: pd.Series | np.ndarray | None, optional
+        The weights for WLS, default is None.
+    fit_intercept: bool, optional
+        Whether to fit an intercept term, default is True.
+
+    Returns
+    -------
+    RegressionResult
+        The regression result object.
+    """
     if isinstance(x, (tuple, list)):
         x = pd.concat(x, axis=1)
 
@@ -119,6 +211,23 @@ def least_square(
 
 
 class RollingRegressor:
+    """
+    Perform rolling regression.
+
+    Parameters
+    ----------
+    x: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The independent variable(s).
+    y: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The dependent variable.
+    w: optional
+        The weights for WLS, default is None.
+    mode: typing.Literal["single", "multi"], optional
+        The mode of regression, default is None.
+    fit_intercept: bool, optional
+        Whether to fit an intercept term, default is True.
+    """
+
     def __init__(
         self,
         x,
@@ -126,16 +235,10 @@ class RollingRegressor:
         w=None,
         *,
         mode: typing.Literal["single", "multi"] = None,
-        axis=0,
         fit_intercept: bool = True,
     ):
-        """
-        Notes
-        -----
-        We generally don't check the alignment of the inputs. It's the user's obligation to make sure the inputs are
-        compatible in turns of shape and align with each other.
-
-        """
+        # We generally don't check the alignment of the inputs. It's the user's obligation to make sure the inputs are
+        # compatible in turns of shape and align with each other.
         self._keys = {}
         self._index = {}
         self._columns = {}
@@ -177,6 +280,14 @@ class RollingRegressor:
 
     @property
     def is_univariate(self):
+        """
+        Check if the regression is univariate.
+
+        Returns
+        -------
+        bool
+            True if univariate, False otherwise.
+        """
         if self.inferred_mode == "single":
             return True
         else:
@@ -184,6 +295,23 @@ class RollingRegressor:
             return False
 
     def _parse_data(self, a, data_name: typing.Literal["x", "y", "w"], allow_none=False):
+        """
+        Parse the input data.
+
+        Parameters
+        ----------
+        a
+            The input data.
+        data_name: typing.Literal["x", "y", "w"]
+            The name of the data.
+        allow_none: bool, optional
+            Whether to allow None as input, default is False.
+
+        Returns
+        -------
+        np.ndarray
+            The parsed data.
+        """
         if a is None:
             if allow_none:
                 return
@@ -225,11 +353,39 @@ class RollingRegressor:
 
     @classmethod
     def _transpose_or_none(cls, _x):
-            # the last 2 axes are always time x stocks
-            if _x is not None:
-                return np.swapaxes(_x, -1, -2)
+        """
+        Transpose the array if it is not None.
+
+        Parameters
+        ----------
+        _x
+            The input array.
+
+        Returns
+        -------
+        np.ndarray or None
+            The transposed array or None.
+        """
+        # the last 2 axes are always time x stocks
+        if _x is not None:
+            return np.swapaxes(_x, -1, -2)
 
     def fit(self, window: int | None = None, axis=0):
+        """
+        Fit the rolling regression model.
+
+        Parameters
+        ----------
+        window: int | None, optional
+            The window size for rolling regression, default is None.
+        axis: int, optional
+            The axis along which to perform the regression, default is 0.
+
+        Returns
+        -------
+        BatchRegressionResult
+            The batch regression result object.
+        """
         x = self.x
         y = self.y
         w = self.w
@@ -266,7 +422,6 @@ class RollingRegressor:
             if n3 != n:
                 raise ValueError(f"x, w should have same length")
 
-
         # window not specified, use total length as window
         # in this case, result should also be pruned
         is_table = window is None
@@ -295,16 +450,16 @@ class RollingRegressor:
                 alpha[i + window - 1, j] = res.alpha
                 beta[:, i + window - 1, j] = res.beta
 
-        ### squeeze if table
+        # squeeze if table
         if is_table:
             # columns
             alpha = alpha[-1]
             # keys x columns
             beta = beta[:, -1]
-        ### maybe transpose back
+        # maybe transpose back
         if transpose:
             beta = self._transpose_or_none(beta)
-        ### wrap dataframe if possible
+        # wrap dataframe if possible
         if is_table:
             alpha = pd.Series(alpha, index=index if transpose else columns, name="alpha")
             if transpose:
@@ -327,8 +482,50 @@ class RollingRegressor:
 
 
 def rolling_regression(x, y, window, w=None, *, fit_intercept=True):
+    """
+    Perform rolling regression.
+
+    Parameters
+    ----------
+    x: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The independent variable(s).
+    y: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The dependent variable.
+    window: int
+        The window size for rolling regression.
+    w: optional
+        The weights for WLS, default is None.
+    fit_intercept: bool, optional
+        Whether to fit an intercept term, default is True.
+
+    Returns
+    -------
+    BatchRegressionResult
+        The batch regression result object.
+    """
     return RollingRegressor(x, y, w, fit_intercept=fit_intercept).fit(window)
 
 
 def table_regression(x, y, w=None, *, fit_intercept=True, axis=0):
+    """
+    Perform table regression (apply regression column-wise or row-wise)
+
+    Parameters
+    ----------
+    x: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The independent variable(s).
+    y: pd.Series | pd.DataFrame | list[pd.Series] | np.ndarray
+        The dependent variable.
+    w: optional
+        The weights for WLS, default is None.
+    fit_intercept: bool, optional
+        Whether to fit an intercept term, default is True.
+    axis: int, optional
+        The axis along which to perform the regression, default is 0.
+
+    Returns
+    -------
+    BatchRegressionResult
+        The batch regression result object.
+    """
     return RollingRegressor(x, y, w, fit_intercept=fit_intercept).fit(None, axis=axis)
