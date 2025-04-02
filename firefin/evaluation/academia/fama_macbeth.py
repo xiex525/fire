@@ -1,6 +1,7 @@
 import pandas as pd
 from typing import List
 from ...core.algorithm.regression import RollingRegressor, BatchRegressionResult
+from ...core.algorithm.newey_west_ttest_1samp import NeweyWestTTest
 
 class FamaMacBeth:
 
@@ -33,8 +34,30 @@ class FamaMacBeth:
 
     
     @staticmethod
-    def test_statistics(results: pd.DataFrame) -> pd.DataFrame:
-        """
-        Calculate test statistics from Fama-MacBeth regression results.
-        """
-        raise NotImplementedError("This method needs to be implemented.")
+    def test_statistics(results: BatchRegressionResult) -> pd.Series:
+        # mean and std
+
+        mean_beta = results.beta.mean()
+        std_beta = results.beta.std()
+        
+        mean_alpha = results.alpha.mean()
+        std_alpha = results.alpha.std()
+
+        # t-statistics
+
+        t_stat, p_value, se = NeweyWestTTest.newey_west_ttest_1samp(
+            results.beta,
+            popmean=0, 
+            lags=6, 
+            nan_policy='omit'
+            ) 
+        
+        return pd.Series({
+            'mean_beta': mean_beta,
+            'std_beta': std_beta,
+            'mean_alpha': mean_alpha,
+            'std_alpha': std_alpha,
+            't_stat': t_stat,
+            'p_value': p_value,
+            'se': se
+        })
