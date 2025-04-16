@@ -14,8 +14,18 @@ def load_data_maps() -> dict[str, str]:
         "close": "file::feather",
         "volume": "file::feather",
         "money": "file::feather",
+        "vwap": "file::feather",
         "return_adj": "file::feather",
         "adj_factor": "file::feather",
+        "turnover_ratio": "file::feather",
+        "pb_ratio": "file::feather",
+        "pe_ratio": "file::feather",
+        "ps_ratio": "file::feather",
+        "pcf_ratio": "file::feather",
+        "market_cap": "file::feather",
+        "circulating_market_cap": "file::feather",
+        "capitalization": "file::feather",
+        "circulating_cap": "file::feather",
     }
 
 

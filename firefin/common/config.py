@@ -1,9 +1,12 @@
 # Licensed under the Apache License: http://www.apache.org/licenses/LICENSE-2.0
 # For details: https://github.com/fire-institute/fire/blob/master/NOTICE.txt
+import os
+import pathlib
+import yaml
+with open(os.path.join(os.path.dirname(__file__), 'config.yaml'), 'r') as stream: 
+    config = yaml.safe_load(stream) 
 
-import configparser
+# Load configuration from YAML file 
 
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-DATA_PATH = config.get(section="data", option="DATA_PATH", fallback="data")
+# Define DATA_PATH based on configuration, expanding user and resolving path 
+DATA_PATH = pathlib.Path(config['DATA_PATH']).expanduser().resolve() 
