@@ -9,7 +9,7 @@ focuses on clarity, documentation, and best practices for financial research.
 import typing
 import numpy as np
 import pandas as pd
-from scipy.stats import ttest_1samp
+from ...core.algorithm.newey_west_ttest_1samp import NeweyWestTTest
 from ..eva_utils import factor_to_quantile, factor_to_quantile_dependent_double_sort
 from ..eva_utils import _compute_quantile_df, _compute_weighted_quantile_df
 from ..eva_utils import ForwardReturns, QuantileReturns
@@ -179,15 +179,17 @@ class PortfolioSort:
         # periods * (quantiles + H-L)
         t_stats = np.empty((len(result), quantiles + 1), dtype=float)
         p_values = np.empty((len(result), quantiles + 1), dtype=float)
+        se_values = np.empty((len(result), quantiles + 1), dtype=float)
         mean_returns = np.empty((len(result), quantiles + 1), dtype=float)
                                 
         for n, (_, period_returns) in enumerate(result.items()):
             # T-Test for all periods
-            t_stats[n], p_values[n] = np.apply_along_axis(
-                ttest_1samp,
-                0,
-                period_returns,
+            t_stats[n], p_values[n], se_values[n] = np.apply_along_axis(
+                NeweyWestTTest.newey_west_ttest_1samp,
+                axis=0,
+                arr=period_returns,
                 popmean=0,
+                lags=6,
                 nan_policy='omit'
             )
             # other statistics can be added here
@@ -195,4 +197,5 @@ class PortfolioSort:
 
         return StatisticResults({'t_stats': pd.DataFrame(t_stats, index=result.keys(), columns=period_returns.columns),
                 'p_values': pd.DataFrame(p_values, index=result.keys(), columns=period_returns.columns),
+                'se_values': pd.DataFrame(se_values, index=result.keys(), columns=period_returns.columns),
                 'mean_returns': pd.DataFrame(mean_returns, index=result.keys(), columns=period_returns.columns)})
