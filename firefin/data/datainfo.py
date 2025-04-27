@@ -2,9 +2,8 @@
 # For details: https://github.com/fire-institute/fire/blob/master/NOTICE.txt
 
 import os
-
 import pandas as pd
-
+from ..common.config import DATA_PATH
 
 def load_data_maps() -> dict[str, str]:
     return {
@@ -30,10 +29,9 @@ def load_data_maps() -> dict[str, str]:
 
 
 def load_AStock_info() -> tuple[pd.DataFrame, pd.DataFrame]:
-    current_dir = os.path.dirname(__file__)
     try:
-        columns = pd.read_feather(os.path.join(current_dir, "./raw/columns.feather"))
-        index = pd.read_feather(os.path.join(current_dir, "./raw/index.feather"))
+        columns = pd.read_feather(os.path.join(DATA_PATH, "columns.feather"))
+        index = pd.read_feather(os.path.join(DATA_PATH, "index.feather"))
     except FileNotFoundError as e:
         raise FileNotFoundError(f"File not found: {e}, please download data first")
     return columns, index
