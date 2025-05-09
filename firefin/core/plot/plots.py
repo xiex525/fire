@@ -12,7 +12,7 @@ from matplotlib.gridspec import GridSpec
 from numba import njit
 from scipy import stats
 
-from .eva_utils import PeriodType, IC, QuantileReturns
+from ...evaluation.eva_utils import PeriodType, IC, QuantileReturns
 
 __all__ = [
     "plt_ic",
@@ -138,8 +138,8 @@ def plt_ic(ic_data: IC, factor_name="Factor", dist=True, plot_dir=None, show=Tru
         "grey": [-0.02, 0.02],
         "darkblue": [-0.05, -0.02],
         "darkred": [0.02, 0.05],
-        "blue": [np.NINF, -0.05],
-        "red": [0.05, np.PINF],
+        "blue": [-np.inf, -0.05],
+        "red": [0.05, np.inf],
     }
 
     summarized_data = _plt_monthly_and_20ma_ic(ic_data, axs, "IC", color_bounds=color_bounds)
