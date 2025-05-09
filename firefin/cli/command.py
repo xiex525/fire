@@ -2,8 +2,8 @@
 # For details: https://github.com/fire-institute/fire/blob/master/NOTICE.txt
 
 import os
-
 import click
+from ..common.config import DATA_PATH
 from loguru import logger
 
 
@@ -19,9 +19,8 @@ def help():
 
 def _prepare_folder():
     # check if data directory exists
-    data_dir = os.path.join(os.path.dirname(__file__), "../data/raw")
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
+    if not DATA_PATH.exists():
+        DATA_PATH.mkdir(parents=True, exist_ok=True)
         logger.info("Data directory is created.")
     else:
         logger.info("Data directory already exists. Skipping creating directory.")
@@ -34,10 +33,12 @@ def download():
     _prepare_folder()
 
     # Check if gz file is exist
-    raw_data_path = os.path.join(os.path.dirname(__file__), "../data/raw/AStockData.tar.gz")
-    if os.path.exists(raw_data_path):
+    raw_data_path = DATA_PATH / "AStockData.tar.gz"
+    if raw_data_path.exists():
         logger.info("Data already exists, Remove Data First...")
-        os.remove(raw_data_path)
+        # ensure the file is removed before downloading again
+        raw_data_path.unlink(missing_ok=True)  # remove the file
+        logger.info("Data Removed.")
     else:
         logger.info("Downloading data ...")
         # Download data from file server
@@ -46,10 +47,10 @@ def download():
         )
 
         os.system(f"wget {request_url} -O {raw_data_path}")
-        os.system(f'tar -xvf {raw_data_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1')
+        os.system(f'tar -xvf {raw_data_path} -C {DATA_PATH} --strip-components=1')
 
-        data_file = os.path.join(os.path.dirname(__file__), "../data/raw/close.feather")
-        if not os.path.exists(data_file):
+        data_file =DATA_PATH / "index.feather"
+        if not data_file.exists():
             raise Exception(f"Failed to download data, If you are behind a proxy, please set it up. or download the data manually from {request_url} and run fire load <file_path> to load the data.")
 
     logger.info("Data is downloaded and saved to local storage. Done!!")
@@ -64,7 +65,7 @@ def load(file_path: str = None):
     # tar unzip file, print progress
     try:
         os.system(
-            f'tar -xvf {file_path} -C {os.path.join(os.path.dirname(__file__), "../data/raw")} --strip-components=1'
+            f'tar -xvf {file_path} -C {DATA_PATH} --strip-components=1'
         )
     except Exception as e:
         logger.error(f"Failed to unzip file: {e}")

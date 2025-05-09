@@ -5,7 +5,11 @@ theme: just-the-docs
 url: fire-institute.github.io
 
 aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
-
+  F.I.R.E. on GitHub: https://github.com/fire-institute/fire
 
 color_scheme: dark
+
+# Build settings
+markdown: kramdown
+compress_html:
+  blanklines: true
