@@ -1,29 +1,9 @@
 ---
 title: Errata
 permalink: /errata/
-nav_order: 1.1
-usemathjax: true
+nav_order: 2
 ---
-
-
 # Errata for *Navigating the Factor Zoo: The Science of Quantitative Investing*
-
-$$x$$ math at the start of the document
-
-Nested: $$M = \text{while e^2 $e^2$ do $c^2$ end}$$
-
-**Numbered equations**
-
-$$
-\begin{equation}
-\int_0^x \sin(x) dx
-\label{eq:test}
-\end{equation}
-$$
-
-
-
-$$R V_{t}^{+} \rightarrow \mathop{\phantom{\,}}_{t-1}^{t} \sigma_{s}^{2} ds+\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau}>0 $$
 ---
 ## Overview
 
@@ -60,10 +40,12 @@ To contribute:
 
 ---
 
-## Edition Index
+## Table of Content
 
 * [First Edition — Routledge (Hardcover & Paperback)](#first-edition-routledge-hardcover--paperback)
   * [Page 66 – Equation 3.19](#page-66-equation-3-19)
+
+
 
 ---
 
@@ -76,32 +58,19 @@ To contribute:
 - **ISBN-13**: 978-1032768434 (HC) / 978-1032768410 (PB)  
 
 ### Page 66 – Equation 3.19 <a name="page-66-equation-3-19"></a>
-**Original**  
+**Original** 
 
-$\rightarrow \mathbb{l}  \mathcal{l} $
+> In the limit of $n \rightarrow \infty$，$R V_{t}^{+} \rightarrow \text{ }_{t-1}^{t} \sigma_{s}^{2} ds+\sum_{t-1 \leq \tau \leq t} J_{\tau J_{\tau}>0 }^{2} $, $ R V_{t}^{-} \rightarrow \int_{t-1}^{t} \sum_{s}^{2} d s+\sum_{t-1 \leq \tau \leq t} J_{\tau J_{\tau}0 }^{2}  $, and,
+>
+> $$S J_{t}=\sum_{t-1 \leq \tau \leq t} J_{\tau J_{\tau}>0 }^{2} -\sum_{t-1 \leq \tau \leq t} J_{\tau J_{\tau} 0}^{2} $$ 
 
-> In the limit of $n \rightarrow \infty$，$R V_{t}^{+} \rightarrow \text{ }_{t-1}^{t} \sigma_{s}^{2} ds+\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau}>0$
-> ```math
-> \text{In the limit of } n \rightarrow \infty \text{ , } R V_{t}^{+} \rightarrow \text{ }_{t-1}^{t} \sigma_{s}^{2} ds+\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau}>0  \text{ , }  R V_{t}^{-} \rightarrow \int_{t-1}^{t} \sigma_{s}^{2} d s+\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau} \text{  and, }
-> ```
-> ```math
-> S J_{t}=\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau}>0-\sum_{t-1 \leq \tau \leq t} J_{\tau}^{2} J_{\tau} 0
-> ```
+**Correction** 
 
-**Correction**  
+> In the limit of $n\to \infty$, $RV_t^+ \to \int _{t- 1}^t\sigma _s^2ds+ \sum_{t- 1\leq \tau \leq t}J_\tau^2 \mathbb{I} _{J_\tau > 0}$, $RV_t^- \to \int_{t- 1}^t \sigma_s^2 ds + \sum_{t-1\leq\tau\leq t}J_\tau^2\mathbb{I}_{J_\tau<0} $, and, 
+>
+> $$SJ_t = \sum_{t- 1\leq \tau \leq t}J_\tau^2 \mathbb{I} _{J_\tau > 0}-\sum_{t-1\leq\tau\leq t}J_\tau^2\mathbb{I}_{J_\tau<0}.$$
 
-> ```math
-> \text{In the limit of } n\to \infty \text{ , } RV_t^+ \to \int _{t- 1}^t\sigma _s^2ds+ \Sigma_{t- 1\leq \tau \leq t}J_\tau^2\mathbb{l} _{J_\tau > 0} \text{ , } RV_t^- \to \int_{t- 1}^t\sigma_s^2ds + \Sigma_{t-1\leq\tau\leq t} J_{\tau}^{2}]_{J_{\tau<0}} \text{, and,}
-> ```
->  ```math
-> SJ_t=\sum_{t-1\leq\tau\leq t}J_\tau^2\mathbb{I}_{J_\tau>0}-\sum_{t-1\leq\tau\leq t}J_\tau^2\mathbb{I}_{J_\tau<0}.
-> ```
+**Note** 
 
-
-
- 
-
-
-**Note**  
-> The summations now correctly use indicator functions to separate positive and negative jumps. The continuous integral term $\int_{t-1}^t \sigma_s^2 ds$ was previously missing the integral symbol and has now been properly reinstated.
+> Inserted the missing integral symbol, properly representing the continuous term as $\int_{t-1}^t\sigma_s^2\,ds$. Replaced the ambiguous jump‐index notation with indicator functions $\mathbb{I}_{J_\tau>0}$ and $\mathbb{I}_{J_\tau<0}$ to clearly separate positive and negative jumps.
 
