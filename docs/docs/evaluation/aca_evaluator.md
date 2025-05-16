@@ -12,15 +12,14 @@
 | `run_double_sort()`            | Perform bivariate (conditional or independent) portfolio sorts                     |
 | `run_fama_macbeth()`           | Run Fama-MacBeth two-pass cross-sectional regressions                              |
 | `run_ic()`                     | Compute the Information Coefficient (IC) between factor values and forward returns |
-| `get_time_series_regression()` | Run time-series regressions on test portfolios to obtain alpha and beta            |
+| `run_msr_test()`               | Compute and compare Max Sharpe Ratios between two factor models                    |
+| `run_regression()`             | Run time-series or rolling regression on test portfolios to obtain alpha and beta  |
 | `get_grs_test()`               | Conduct the Gibbons-Ross-Shanken (GRS) test to check model pricing accuracy        |
-| `get_sharpe_ratio_test()`      | Compare Sharpe Ratios between two factor models                                    |
 | `get_hj_distance_test()`       | Compute Hansen–Jagannathan distance to assess pricing error                        |
 | `compare_model_alphas()`       | Compare model alphas across multiple asset pricing models                          |
 | `run_horse_race_regression()`  | Evaluate marginal explanatory power of factors (horse race regression)             |
 | `get_spanning_test()`          | Check whether a new factor is spanned by an existing model                         |
 | `run_subsample_analysis()`     | Perform robustness tests by splitting the sample                                   |
-| `run_rolling_regression()`     | Conduct rolling-window regressions to examine time variation                       |
 | `compute_vif()`                | Calculate Variance Inflation Factors to detect multicollinearity                   |
 
 ---
@@ -34,7 +33,7 @@ AcaEvaluator(factor: pd.DataFrame, forward_returns: dict[str, pd.DataFrame])
 **Parameters:**
 
 * `factor`: A (Time × Stock) DataFrame of factor exposures
-* `forward_returns`: A dictionary of forward return DataFrames, e.g., `{"1M": df_1m, "3M": df_3m}`
+* `forward_returns`: A (Time × Stock) DataFrame of forward return
 
 ---
 
@@ -67,7 +66,9 @@ Perform double sorting based on two factors.
 * `factor2` (pd.DataFrame): Second factor
 * `quantiles` (tuple\[int, int]): Quantile group counts for each factor
 * `dependent` (bool): Use nested sort if True
-* `value_weighted`, `market_cap`, `get_quantile_sorts`: Same as `run_single_sort`
+* `value_weighted` (bool): If True, portfolios are value-weighted; otherwise equal-weighted
+* `market_cap` (pd.DataFrame): Required if `value_weighted` is True; same shape as `factor`
+* `get_quantile_sorts` (bool): Return group labels of stocks by quantile
 
 **Returns:**
 
@@ -105,19 +106,39 @@ Calculate Information Coefficient between factor and future returns.
 
 ---
 
-### `get_time_series_regression()`
+### `run_msr_test()`
 
-Run time-series regression for test portfolios.
+Compare the maximum Sharpe ratios (MSRs) of two factor models using a z-test.
 
 **Parameters:**
 
-* `test_portfolios` (pd.DataFrame): Return matrix (time × portfolios)
-* `plot` (bool): Whether to display alpha/t-stat plots
+* `model_a_factors` (pd.DataFrame): Factor returns of Model A (Time × K)
+* `model_b_factors` (pd.DataFrame): Factor returns of Model B (Time × K)
+* `regularize_covariance` (bool): If True, regularize the covariance matrix.
 
 **Returns:**
 
-* Dictionary with keys: `alphas`, `t_stats`, `p_values`, `betas`
+* Dictionary with keys:
+  - `msr_a`: Maximum Sharpe ratio of Model A
+  - `msr_b`: Maximum Sharpe ratio of Model B
+  - `test_stat`: z-test statistic comparing MSRs
+  - `p_value`: p-value of the test
 
+---
+
+### `run_regression()`
+
+Run either standard or rolling time-series regression on test portfolios, based on a flag.
+
+**Parameters:**
+
+* `rolling` (bool): optionalWhether to perform rolling regression, by default False.
+* `window` (int): optionalRolling window size (only used if rolling=True), by default 60.
+* `fit_intercept` (bool): optionalWhether to include an intercept in the regression, by default True.
+
+**Returns:**
+
+* `BatchRegressionResult` (dict): Regression result object (static) or a dictionary of rolling results.
 ---
 
 ### `get_grs_test()`
@@ -132,21 +153,6 @@ Run GRS test for overall model explanatory power.
 **Returns:**
 
 * Dictionary with keys: `grs_stat`, `p_value`, `alphas`, `t_stats`, `residual_cov`, `betas`
-
----
-
-### `get_sharpe_ratio_test()`
-
-Compare maximum Sharpe Ratios of two models.
-
-**Parameters:**
-
-* `model_a_factors`, `model_b_factors`: Factor return DataFrames
-* `plot`: Whether to display bar chart
-
-**Returns:**
-
-* `dict`: Contains `sr_a`, `sr_b`, `test_stat`, `p_value`
 
 ---
 
@@ -229,23 +235,6 @@ Run out-of-sample robustness checks across different time periods.
 **Returns:**
 
 * Dictionary with per-sample evaluation results
-
----
-
-### `run_rolling_regression()`
-
-Apply rolling time-series regression to observe alpha/beta stability.
-
-**Parameters:**
-
-* `test_portfolios`: Portfolio return matrix
-* `window`: Length of rolling window
-* `min_obs`: Minimum observations per window
-* `plot`: Whether to visualize alpha/beta series
-
-**Returns:**
-
-* Dictionary with rolling alpha, t-stats, and per-factor rolling betas
 
 ---
 
