@@ -136,7 +136,12 @@ class BatchRegressionResult:
 
 
 def _regression(
-    x: pd.DataFrame | pd.Series, y: pd.Series, w: pd.Series = None, fit_intercept: bool = True
+    x: pd.DataFrame | pd.Series, 
+    y: pd.Series, 
+    w: pd.Series = None, 
+    fit_intercept: bool = True, 
+    cov_type: str | None = None,
+    cov_kwds: dict | None = None
 ) -> sm.regression.linear_model.RegressionResults:
     """
     Perform a linear regression using either OLS or WLS.
@@ -151,6 +156,14 @@ def _regression(
         The weights for WLS, default is None.
     fit_intercept: bool, optional
         Whether to fit an intercept term, default is True.
+    cov_type: str | None, optional
+        The covariance estimator, default is None.
+        - If None: use the default homoskedastic standard errors.  
+        - If "HAC": Newey–West heteroskedasticity-and-autocorrelation robust SE.  
+        - Other options supported by statsmodels (e.g. "HC0", "HC1", …).
+    cov_kwds: dict | None, optional
+        The keyword arguments for the covariance estimator, default is None.
+        For Newey–West, you’d typically pass `{"maxlags": L}` to control lag length.
 
     Returns
     -------
@@ -163,7 +176,11 @@ def _regression(
         model = sm.OLS(y, x)
     else:
         model = sm.WLS(y, x, weights=w)
-    return model.fit()
+
+    if cov_type is None:
+        return model.fit()
+    else:
+        return model.fit(cov_type=cov_type, cov_kwds=cov_kwds or {})   
 
 
 def least_square(
@@ -370,7 +387,7 @@ class RollingRegressor:
         if _x is not None:
             return np.swapaxes(_x, -1, -2)
 
-    def fit(self, window: int | None = None, axis=0):
+    def fit(self, window: int | None = None, axis=0, cov_type: str | None = None, cov_kwds: dict | None = None):
         """
         Fit the rolling regression model.
 
@@ -380,6 +397,14 @@ class RollingRegressor:
             The window size for rolling regression, default is None.
         axis: int, optional
             The axis along which to perform the regression, default is 0.
+        cov_type: str | None, optional
+            The covariance estimator, default is None.
+            - If None: use the default homoskedastic standard errors.  
+            - If "HAC": Newey–West heteroskedasticity-and-autocorrelation robust SE.  
+            - Other options supported by statsmodels (e.g. "HC0", "HC1", …).
+        cov_kwds: dict | None, optional
+            The keyword arguments for the covariance estimator, default is None.
+            For Newey–West, you’d typically pass `{"maxlags": L}` to control lag length.
 
         Returns
         -------
@@ -448,9 +473,9 @@ class RollingRegressor:
                 else:
                     res = RegressionResult(
                         # fit_intercept is always False, because we've padded X in __init__
-                        _regression(x_j, y_j, w_j, fit_intercept=False),
+                        _regression(x_j, y_j, w_j, fit_intercept=False, cov_type=cov_type, cov_kwds=cov_kwds),
                         fit_intercept=fit_intercept,
-                        univariate=univariate,
+                        univariate=univariate
                     )
                     alpha[i + window - 1, j] = res.alpha
                     beta[:, i + window - 1, j] = res.beta
