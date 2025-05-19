@@ -511,7 +511,7 @@ def rolling_regression(x, y, window, w=None, *, fit_intercept=True):
     return RollingRegressor(x, y, w, fit_intercept=fit_intercept).fit(window)
 
 
-def table_regression(x, y, w=None, *, fit_intercept=True, axis=0):
+def table_regression(x, y, w=None, *, fit_intercept=True, axis=1):
     """
     Perform table regression (apply regression column-wise or row-wise)
 
@@ -526,7 +526,7 @@ def table_regression(x, y, w=None, *, fit_intercept=True, axis=0):
     fit_intercept: bool, optional
         Whether to fit an intercept term, default is True.
     axis: int, optional
-        The axis along which to perform the regression, default is 0.
+        The axis along which to perform the regression, default is 1.
 
     Returns
     -------
