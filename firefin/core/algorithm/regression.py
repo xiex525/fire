@@ -226,30 +226,19 @@ class RollingRegressor:
         The mode of regression, default is None.
     fit_intercept: bool, optional
         Whether to fit an intercept term, default is True.
-
-    在多因子模型里，x 并不是一个单纯的 (T, N) 矩阵，而是 K 个因子、每个因子自己都有一套 (T, N) 数据。
-
-     如果你把它们硬生生拼在一个 (T, N×K) 的大矩阵里，既不好管理，也丢失了“这是哪个因子”的信息。
-
-     更清晰的做法，是让你像这样传入：
-    x = {
-      "mk":  market_excess_return_df,   # 市场超额收益 (T×N)
-      "smb": size_factor_df,            # SMB 因子 (T×N)
-      "hml": value_factor_df            # HML 因子 (T×N)
-    }
     """
 
     def __init__(
         self,
-        x,#这里x的结构是（K,N,T)的数组K是因子个数，这里面由于有些因子数值因股票不同而异，所以会是三维数组
-        y,#因变量，也就是股票的超额收益（N*T)
+        x,
+        y,
         w=None,
         *,
         mode: typing.Literal["single", "multi"] = None,
         fit_intercept: bool = True,
     ):
         # We generally don't check the alignment of the inputs. It's the user's obligation to make sure the inputs are
-        # compatible in terms of shape and align with each other.
+        # compatible in turns of shape and align with each other.
         self._keys = {}
         self._index = {}
         self._columns = {}
@@ -443,7 +432,6 @@ class RollingRegressor:
         if fit_intercept:
             alpha = np.full((n, m), np.nan)
         beta = np.full((k - fit_intercept, n, m), np.nan)
-        residual=np.full((window,n,m),np.nan)#新增输出residual的位置
 
         for i in range(n - window + 1):
             x_wind = x[:, i : i + window]
@@ -466,7 +454,6 @@ class RollingRegressor:
                     )
                     alpha[i + window - 1, j] = res.alpha
                     beta[:, i + window - 1, j] = res.beta
-                    residual[:,i + window - 1, j]=res.residuals
 
         # squeeze if table
         if is_table:
@@ -474,14 +461,12 @@ class RollingRegressor:
             alpha = alpha[-1]
             # keys x columns
             beta = beta[:, -1]
-            residual=residual[-1]
         # maybe transpose back
         if transpose:
             beta = self._transpose_or_none(beta)
         # wrap dataframe if possible
         if is_table:
             alpha = pd.Series(alpha, index=index if transpose else columns, name="alpha")
-            residual = [pd.series(residual, index=index if transpose else columns, name="residual")]
             if transpose:
                 # axis = 1
                 beta = pd.DataFrame(beta, index=index, columns=keys)
@@ -491,7 +476,6 @@ class RollingRegressor:
                 beta = beta.squeeze(axis=axis)
         else:
             alpha = pd.DataFrame(alpha, index=index, columns=columns)
-            residual = [pd.DataFrame(residual[i], index=index, columns=columns) for i in range(60)]
             if self.is_univariate:
                 beta = pd.DataFrame(np.squeeze(beta, axis=0), index=index, columns=columns)
             else:
@@ -499,7 +483,7 @@ class RollingRegressor:
                 if keys is not None:
                     for _key, _beta in zip(keys, beta):
                         _beta.name = _key
-        return BatchRegressionResult(beta, alpha=alpha,residuals=residual)
+        return BatchRegressionResult(beta, alpha=alpha)
 
 
 def rolling_regression(x, y, window, w=None, *, fit_intercept=True):
