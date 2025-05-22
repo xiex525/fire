@@ -12,7 +12,6 @@ def read_feather(names):
         result = {n : pd.read_feather(f"{DATA_PATH}/{n}.feather") for n in names}
     except FileNotFoundError as e:
         raise FileNotFoundError(f"File not found: {e}, please download data first")
-
     return result
 
 
