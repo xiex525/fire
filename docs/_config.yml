@@ -8,3 +8,8 @@ aux_links:
   F.I.R.E. on GitHub: https://github.com/fire-institute/fire
 
 color_scheme: dark
+
+# Build settings
+markdown: kramdown
+compress_html:
+  blanklines: true
