@@ -1,23 +1,26 @@
 import typing
 import pandas as pd
-from ..eva_utils import ForwardReturns, compute_ic
+from ..eva_utils import compute_ic, ForwardReturns, QuantileReturns
 from .portfolio_sort import PortfolioSort
 from .fama_macbeth import FamaMacBeth
 from ...core.algorithm.regression import least_square, rolling_regression, BatchRegressionResult
 from .anomaly_test import AnomalyTest
 
 class AcaEvaluatorModel:
-    def __init__(self, factor: pd.DataFrame, forward_returns: ForwardReturns):
+    def __init__(self, factor: pd.DataFrame, forward_returns: ForwardReturns,  return_adj: pd.DataFrame):
         """
         Parameters:
             factor: pd.DataFrame
                 Factor exposure data (Time × Stock)
             forward_returns: dict[str, pd.DataFrame]
                 A dictionary where each key is a holding period, and the value is a DataFrame of future returns (Time × Stock)
+            return_adj: pd.DataFrame
+                DataFrame of adjusted returns (Time × Stock)
         """
 
         self.factor = factor
         self.forward_returns = forward_returns
+        self.return_adj = return_adj
 
     def run_single_sort(self,
                         quantiles: int = 5,
@@ -67,15 +70,12 @@ class AcaEvaluatorModel:
         return portfolio_returns
 
     def run_fama_macbeth(self,
-                         return_adj: pd.DataFrame,
                          window: int = 252,
                          return_stats: bool = False):
         """
         Perform Fama-MacBeth two-stage cross-sectional regression estimation.
 
         Parameters:
-            return_adj: pd.DataFrame
-                Adjusted returns for each period (e.g., monthly returns)
             window: int
                 Rolling window size for the first-stage regressions (default is 252, i.e., one year)
             return_stats: bool
@@ -88,7 +88,7 @@ class AcaEvaluatorModel:
                 RegressionResult
         """
 
-        results = FamaMacBeth.run_regression(self.factor, return_adj, window=window)
+        results = FamaMacBeth.run_regression(self.factor, self.return_adj, window=window)
         if return_stats:
             stats = FamaMacBeth.test_statistics(results)
             return results, stats
@@ -129,14 +129,14 @@ class AcaEvaluatorModel:
         """
         if rolling:
             # Use rolling_regression function
-            result = rolling_regression(x=self.factor, y=self.forward_returns, window=window, fit_intercept=fit_intercept)
+            result = rolling_regression(x=self.factor, y=self.return_adj, window=window, fit_intercept=fit_intercept)
         else:
             # Time-by-time regression using least_square
             from collections import defaultdict
             results = defaultdict(list)
             for t in self.factor.index:
                 x_t = self.factor.loc[t]
-                y_t = self.forward_returns.loc[t]
+                y_t = self.return_adj.loc[t]
                 if x_t.isnull().any() or y_t.isnull().any():
                     continue
                 reg_result = least_square(x=x_t, y=y_t, fit_intercept=fit_intercept)
@@ -149,6 +149,7 @@ class AcaEvaluatorModel:
         return result
         
     def run_anomaly_test(self,
+                         portfolio_returns: QuantileReturns,
                          cov_type: typing.Optional[str] = None,
                          cov_kwds: typing.Optional[dict] = None,
                          return_stats: bool = False):
@@ -165,8 +166,7 @@ class AcaEvaluatorModel:
             Else:
                 AnomalyTest
         """
-        tester = AnomalyTest(portfolio_returns=self.forward_returns,
-                             factor_model=self.factor).fit(cov_type=cov_type, cov_kwds=cov_kwds)
+        tester = AnomalyTest(portfolio_returns= portfolio_returns, factor_model=self.factor).fit(cov_type=cov_type, cov_kwds=cov_kwds)
         if return_stats:
             summary = tester.test_statistics()
             return tester, summary
@@ -195,15 +195,12 @@ class AcaEvaluatorModel:
 
         #Fama-MacBeth Regression
         try:
-            return_adj = forward_returns
             results['fama_macbeth'] = self.run_fama_macbeth(
-                return_adj=return_adj,
                 window=252,
                 return_stats=True
             )
         except Exception as e:
             results['fama_macbeth'] = f"Error: {e}"
-
         # IC
         try:
             results['information_coefficient'] = self.run_ic(method="pearson")
@@ -218,8 +215,8 @@ class AcaEvaluatorModel:
             
         # Anomaly Test
         try:
-            results['anomoly'] = self.run_anomaly_test(return_stats= True)
+            results['anomaly'] = self.run_anomaly_test(portfolio_returns= results['single_sort_res'], return_stats= True)
         except Exception as e:
-            results['anomoly'] = f"Error: {e}"
+            results['anomaly'] = f"Error: {e}"
 
         return results
