@@ -1,9 +1,10 @@
-import typing
-import pandas as pd
-from firefin.evaluation.academia.portfolio_sort import PortfolioSort
-from firefin.evaluation.academia.MSR_Test import MSRTest
 
-class AcaEvaluator_mult:
+import pandas as pd
+from .portfolio_sort import PortfolioSort
+from .MSR_Test import MSRTest
+from ..eva_utils import ForwardReturns
+
+class AcaEvaluatorModelComparison:
     def __init__(self, factor1: pd.DataFrame, factor2: pd.DataFrame, forward_returns: ForwardReturns):
         """
         Parameters:

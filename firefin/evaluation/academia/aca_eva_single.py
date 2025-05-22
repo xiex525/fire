@@ -1,12 +1,12 @@
 import typing
 import pandas as pd
-from firefin.evaluation.eva_utils import ForwardReturns, compute_ic
-from firefin.evaluation.academia.portfolio_sort import PortfolioSort
-from firefin.evaluation.academia.fama_macbeth import FamaMacBeth
-from firefin.core.algorithm.regression import least_square, rolling_regression, BatchRegressionResult
-from firefin.evaluation.academia.anomoly_test import AnomalyTest
+from ..eva_utils import ForwardReturns, compute_ic
+from .portfolio_sort import PortfolioSort
+from .fama_macbeth import FamaMacBeth
+from ...core.algorithm.regression import least_square, rolling_regression, BatchRegressionResult
+from .anomaly_test import AnomalyTest
 
-class AcaEvaluator_single:
+class AcaEvaluatorModel:
     def __init__(self, factor: pd.DataFrame, forward_returns: ForwardReturns):
         """
         Parameters:
@@ -149,8 +149,8 @@ class AcaEvaluator_single:
         return result
         
     def run_anomaly_test(self,
-                         cov_type: Optional[str] = None,
-                         cov_kwds: Optional[dict] = None,
+                         cov_type: typing.Optional[str] = None,
+                         cov_kwds: typing.Optional[dict] = None,
                          return_stats: bool = False):
         """
         Perform anomaly test by regressing portfolio returns on a factor model.
