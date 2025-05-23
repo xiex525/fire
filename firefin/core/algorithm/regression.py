@@ -171,11 +171,19 @@ def _regression(
     sm.regression.linear_model.RegressionResults
         The regression results.
     """
+    
+    ## if x contains nan, fill nan with 0
+    ## TODO: fill nan with 0 is not a good idea, we should use the mean of the column to fill nan
+    x = np.nan_to_num(x, nan=0)
+    y = np.nan_to_num(y, nan=0)
+
     if fit_intercept:
         x = sm.add_constant(x)
     if w is None:
         model = sm.OLS(y, x)
     else:
+        ## TODO: fill nan with 0 is not a good idea, we should use the mean of the column to fill nan
+        y = np.nan_to_num(y, nan=0)
         model = sm.WLS(y, x, weights=w)
 
     if cov_type is None:
