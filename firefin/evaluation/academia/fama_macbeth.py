@@ -8,7 +8,7 @@ class FamaMacBeth:
 
     @staticmethod
     def run_regression(
-        factor: pd.DataFrame | pd.Series, return_adj: pd.DataFrame, window: int = 252, verbose: bool = False
+        factor: pd.DataFrame | pd.Series, return_adj: pd.DataFrame, window: int = 252, n_jobs=4, verbose: int = 0
     ) -> BatchRegressionResult:
         """
         Run Fama-MacBeth regression."
@@ -27,11 +27,11 @@ class FamaMacBeth:
         # excess return is different in many cases, we leave it to the user to handle this.
 
         # First step: Time-series regressions
-        r = RollingRegressor(factor, return_adj, None, fit_intercept=True).fit(window, verbose=verbose)
+        r = RollingRegressor(factor, return_adj, None, fit_intercept=True).fit(window, n_jobs=n_jobs, verbose=verbose)
 
         # Second step: Cross-sectional regressions
         # This step involves regressing the time-series regression coefficients on the factors
-        r = RollingRegressor(r.beta, return_adj, None, fit_intercept=True).fit(window=None, axis=1, verbose=verbose)
+        r = RollingRegressor(r.beta, return_adj, None, fit_intercept=True).fit(window=None, axis=1, n_jobs=n_jobs, verbose=verbose)
 
         return r
 

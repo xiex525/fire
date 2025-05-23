@@ -11,7 +11,7 @@ import typing
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from tqdm.auto import tqdm
+from joblib import Parallel, delayed
 
 __all__ = ["least_square", "RollingRegressor", "rolling_regression", "table_regression"]
 
@@ -228,6 +228,34 @@ def least_square(
     return RegressionResult(result, fit_intercept=fit_intercept, univariate=univariate)
 
 
+@delayed
+def calculate_window(x_wind, y_wind, w_wind, m1, m2, m3, m, fit_intercept, univariate, cov_type, cov_kwds):
+    alphas: list[float] = []
+    betas: list[float | np.ndarray | None] = []
+    for j in range(m):
+        x_j = x_wind[:, :, min(j, m1 - 1)].T
+        y_j = y_wind[:, min(j, m2 - 1)]
+        w_j = None if w_wind is None else w_wind[:, min(j, m3 - 1)]
+        # if any x is all nan, skip regression
+        if np.isnan(x_j).all(axis=0).any() or np.isnan(y_j).all():
+            # alpha 一定是float；beta可能是array或者float，所以用None表示🈳
+            alpha = np.nan
+            beta = None
+        else:
+            res = RegressionResult(
+                # fit_intercept is always False, because we've padded X in __init__
+                _regression(x_j, y_j, w_j, fit_intercept=False, cov_type=cov_type, cov_kwds=cov_kwds),
+                fit_intercept=fit_intercept,
+                univariate=univariate,
+            )
+            alpha = res.alpha
+            beta = res.beta
+        alphas.append(alpha)
+        betas.append(beta)
+
+    return alphas, betas
+
+
 class RollingRegressor:
     """
     Perform rolling regression.
@@ -394,7 +422,8 @@ class RollingRegressor:
         axis=0,
         cov_type: str | None = None,
         cov_kwds: dict | None = None,
-        verbose: bool = False,
+        n_jobs: int = 4,
+        verbose: int = 0,
     ):
         """
         Fit the rolling regression model.
@@ -413,8 +442,10 @@ class RollingRegressor:
         cov_kwds: dict | None, optional
             The keyword arguments for the covariance estimator, default is None.
             For Newey–West, you’d typically pass `{"maxlags": L}` to control lag length.
-        verbose: bool
-            If True, show progress bar
+        n_jobs: int
+            num of parallel workers, passed to Parallel
+        verbose: int
+            verbosity of progress, passed to Parallel
 
         Returns
         -------
@@ -468,29 +499,27 @@ class RollingRegressor:
             alpha = np.full((n, m), np.nan)
         beta = np.full((k - fit_intercept, n, m), np.nan)
 
-        with tqdm(total=(n - window + 1) * m, disable=not verbose) as pbar:
-            for i in range(n - window + 1):
-                x_wind = x[:, i : i + window]
-                y_wind = y[i : i + window]
-                w_wind = None if w is None else w[i : i + window]
-                for j in range(m):
-                    x_j = x_wind[:, :, min(j, m1 - 1)].T
-                    y_j = y_wind[:, min(j, m2 - 1)]
-                    w_j = None if w_wind is None else w_wind[:, min(j, m3 - 1)]
-                    # if any x is all nan, skip regression
-                    if np.isnan(x_j).all(axis=0).any() or np.isnan(y_j).all():
-                        alpha[i + window - 1, j] = np.nan
-                        beta[:, i + window - 1, j] = np.nan
-                    else:
-                        res = RegressionResult(
-                            # fit_intercept is always False, because we've padded X in __init__
-                            _regression(x_j, y_j, w_j, fit_intercept=False, cov_type=cov_type, cov_kwds=cov_kwds),
-                            fit_intercept=fit_intercept,
-                            univariate=univariate,
-                        )
-                        alpha[i + window - 1, j] = res.alpha
-                        beta[:, i + window - 1, j] = res.beta
-                    pbar.update()
+        result_gen = Parallel(n_jobs=n_jobs, verbose=verbose, return_as="generator")(
+            calculate_window(
+                x_wind=x[:, i : i + window],
+                y_wind=y[i : i + window],
+                w_wind=None if w is None else w[i : i + window],
+                m1=m1,
+                m2=m2,
+                m3=m3,
+                m=m,
+                fit_intercept=fit_intercept,
+                univariate=univariate,
+                cov_type=cov_type,
+                cov_kwds=cov_kwds,
+            )
+            for i in range(n - window + 1)
+        )
+        for i, (alphas, betas) in enumerate(result_gen):
+            alpha[i + window - 1] = alphas
+            for j, _beta in enumerate(betas):
+                if _beta is not None:
+                    beta[:, i + window - 1, j] = _beta
 
         # squeeze if table
         if is_table:
