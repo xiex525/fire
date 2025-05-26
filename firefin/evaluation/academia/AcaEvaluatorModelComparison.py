@@ -1,4 +1,3 @@
-
 import pandas as pd
 from .portfolio_sort import PortfolioSort
 from .MSR_Test import MSRTest
@@ -57,12 +56,10 @@ class AcaEvaluatorModelComparison:
             get_quantile_sorts=get_quantile_sorts
         )
 
-    def run_msr_test(self, model_a, model_b, regularize=True):
+    def run_msr_test(self, regularize=True):
         """
         Compare the Maximum Sharpe Ratios of two factor models using a Z-test.
         Args:
-            model_a (pd.DataFrame): T × K matrix of factor returns for model A.
-            model_b (pd.DataFrame): T × K matrix of factor returns for model B.
             regularize_covariance (bool): If True, regularize the covariance matrix.
         Returns:
             dict: {
@@ -100,8 +97,6 @@ class AcaEvaluatorModelComparison:
     
         try:
             results['msr_test'] = self.run_msr_test(
-                model_a=self.factor1,
-                model_b=self.factor2,
                 regularize=True
             )
         except Exception as e:
