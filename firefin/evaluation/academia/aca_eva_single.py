@@ -1,13 +1,14 @@
 import typing
 import pandas as pd
 from ..eva_utils import compute_ic, ForwardReturns, QuantileReturns
-from .portfolio_sort import PortfolioSort
-from .fama_macbeth import FamaMacBeth
 from ...core.algorithm.regression import least_square, rolling_regression, BatchRegressionResult
+from ...common.config import logger
 from .anomaly_test import AnomalyTest
+from .fama_macbeth import FamaMacBeth
+from .portfolio_sort import PortfolioSort
 
 class AcaEvaluatorModel:
-    def __init__(self, factor: pd.DataFrame, forward_returns: ForwardReturns,  return_adj: pd.DataFrame):
+    def __init__(self, factor: pd.DataFrame, forward_returns: ForwardReturns,  return_adj: pd.DataFrame, n_jobs: int = 10, verbose: int = 0):
         """
         Parameters:
             factor: pd.DataFrame
@@ -16,12 +17,17 @@ class AcaEvaluatorModel:
                 A dictionary where each key is a holding period, and the value is a DataFrame of future returns (Time × Stock)
             return_adj: pd.DataFrame
                 DataFrame of adjusted returns (Time × Stock)
+            n_jobs: int
+                Number of jobs to run in parallel
+            verbose: int
+                Verbosity level
         """
 
         self.factor = factor
         self.forward_returns = forward_returns
         self.return_adj = return_adj
-
+        self.n_jobs = n_jobs
+        self.verbose = verbose
     def run_single_sort(self,
                         quantiles: int = 5,
                         value_weighted: bool = True,
@@ -88,7 +94,7 @@ class AcaEvaluatorModel:
                 RegressionResult
         """
 
-        results = FamaMacBeth.run_regression(self.factor, self.return_adj, window=window)
+        results = FamaMacBeth.run_regression(self.factor, self.return_adj, window=window, n_jobs=self.n_jobs, verbose=self.verbose)
         if return_stats:
             stats = FamaMacBeth.test_statistics(results)
             return results, stats
@@ -129,7 +135,7 @@ class AcaEvaluatorModel:
         """
         if rolling:
             # Use rolling_regression function
-            result = rolling_regression(x=self.factor, y=self.return_adj, window=window, fit_intercept=fit_intercept)
+            result = rolling_regression(x=self.factor, y=self.return_adj, window=window, fit_intercept=fit_intercept, n_jobs=self.n_jobs, verbose=self.verbose)
         else:
             # Time-by-time regression using least_square
             from collections import defaultdict
@@ -184,39 +190,33 @@ class AcaEvaluatorModel:
         """
         results = {}
         #Single Sort
-        try:
-            results['single_sort_res'], results['single_sort_stat'] = self.run_single_sort(
-                quantiles=5,
-                value_weighted=False,
-                return_stats=True
-            )
-        except Exception as e:
-            results['single_sort'] = f"Error: {e}"
-
+        logger.info("Running Single Sort")
+        results['single_sort_res'], results['single_sort_stat'] = self.run_single_sort(
+            quantiles=5,
+            value_weighted=False,
+            return_stats=True
+        )
+        logger.info("Single Sort Completed")
         #Fama-MacBeth Regression
-        try:
-            results['fama_macbeth'] = self.run_fama_macbeth(
-                window=252,
-                return_stats=True
-            )
-        except Exception as e:
-            results['fama_macbeth'] = f"Error: {e}"
+        logger.info("Running Fama-MacBeth Regression")
+        results['fama_macbeth'] = self.run_fama_macbeth(
+            window=252,
+            return_stats=True
+        )
+        logger.info("Fama-MacBeth Regression Completed")
         # IC
-        try:
-            results['information_coefficient'] = self.run_ic(method="pearson")
-        except Exception as e:
-            results['information_coefficient'] = f"Error: {e}"
+        logger.info("Running IC")
+        results['information_coefficient'] = self.run_ic(method="pearson")
+        logger.info("IC Completed")
 
         # Static Regression
-        try:
-            results['regression'] = self.run_regression(rolling=False, fit_intercept=True)
-        except Exception as e:
-            results['regression'] = f"Error: {e}"
+        logger.info("Running Static Regression")
+        results['regression'] = self.run_regression(rolling=False, fit_intercept=True)
+        logger.info("Static Regression Completed")
             
         # Anomaly Test
-        try:
-            results['anomaly'] = self.run_anomaly_test(portfolio_returns= results['single_sort_res'], return_stats= True)
-        except Exception as e:
-            results['anomaly'] = f"Error: {e}"
+        logger.info("Running Anomaly Test")
+        results['anomaly'] = self.run_anomaly_test(portfolio_returns= results['single_sort_res'], return_stats= True)
+        logger.info("Anomaly Test Completed")
 
         return results
