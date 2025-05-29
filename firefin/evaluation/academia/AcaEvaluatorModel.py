@@ -178,10 +178,12 @@ class AcaEvaluatorModel:
             Else:
                 AnomalyTest
         """
-        tester = AnomalyTest(portfolio_returns= portfolio_returns, factor_model=self.factor).fit(cov_type=cov_type, cov_kwds=cov_kwds)
+        mkt_ret = pd.DataFrame(self.return_adj.mean(axis=1))
+        tester = AnomalyTest(portfolio_returns= portfolio_returns, factor_model=mkt_ret)
+        
         if return_stats:
-            summary = tester.test_statistics()
-            return tester, summary
+            summary = tester.fit(cov_type=cov_type, cov_kwds=cov_kwds).test_statistics()
+            return summary
         return tester
 
 
@@ -222,7 +224,8 @@ class AcaEvaluatorModel:
             
         # Anomaly Test
         logger.info("Running Anomaly Test")
-        results['anomaly'] = {k: self.run_anomaly_test(portfolio_returns= v, return_stats= True) for k, v in results['single_sort_res'].items()}
+        for k, v in results['single_sort_res'].items():
+            results['anomaly_stat'] = {k:self.run_anomaly_test(portfolio_returns= pd.DataFrame(v.iloc[:,-1]), return_stats= True)}
         logger.info("Anomaly Test Completed")
 
         return results
