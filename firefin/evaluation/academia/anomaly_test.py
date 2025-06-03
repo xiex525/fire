@@ -108,7 +108,6 @@ class AnomalyTest:
             univariate = (x_df.shape[1] == 1)
             wrapped = RegressionResult(raw_res, fit_intercept=True, univariate=univariate)
             self._regression_results[port] = wrapped
-
         return self
 
     def test_statistics(self) -> pd.DataFrame:
@@ -122,23 +121,18 @@ class AnomalyTest:
             columns ['coef', 'tvalue', 'stderr', 'pvalue'].
         """
         records = []
-        index_keys: list[tuple[str, str]] = []
         for port, res in self._regression_results.items():
             params = res.sm_result.params
             tvals = res.sm_result.tvalues
             stderrs = res.sm_result.bse
             pvals = res.sm_result.pvalues
-            for param_name in params.index:
-                index_keys.append((port, param_name))
-                records.append({
-                    'coef': params[param_name],
-                    'tvalue': tvals[param_name],
-                    'stderr': stderrs[param_name],
-                    'pvalue': pvals[param_name],
-                })
-        mi = pd.MultiIndex.from_tuples(index_keys, names=['portfolio', 'parameter'])
-        summary = pd.DataFrame(records, index=mi)
-        return summary
+            records.append({
+                'coef': params,
+                'tvalue': tvals,
+                'stderr': stderrs,
+                'pvalue': pvals
+            })
+        return records
 
     def alpha(self, portfolio: str) -> float:
         """
