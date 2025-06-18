@@ -3,14 +3,10 @@
 
 import numpy as np
 import pandas as pd
-from loguru import logger
-
-from .datainfo import load_data_maps, load_AStock_info
+from ..common.config import logger, DATA_MAPS
+from .datainfo import load_AStock_info
 from .fake import gen_df
 from .file_reader import file_reader
-
-ALL_DATA_NAMES = load_data_maps()
-
 
 def _get_clean_names(names) -> list:
     output = []
@@ -113,7 +109,7 @@ def _parse_args(names, start_date, end_date, dates):
 
 
 def check_if_valid(names: list[str]) -> dict[str, bool]:
-    return {n: n in ALL_DATA_NAMES for n in names}
+    return {n: n in DATA_MAPS.keys() for n in names}
 
 
 def fetch_data(
@@ -137,19 +133,22 @@ def fetch_data(
 
     valid = check_if_valid(names)
 
-    columns, index = load_AStock_info()
     for k, v in valid.items():
         if not v:
+            columns, index = load_AStock_info()
             logger.warning(f"{k} is not a valid data name, mock with random data")
             results[k] = gen_df((len(index), len(columns)))
             names.remove(k)
+
+    if len(names) == 0:
+        return results
 
     # only support file reader for now
     file_reader_names = dict()
 
     for name in names:
         try:
-            l, r = ALL_DATA_NAMES[name].split("::")  # noqa: E741
+            l, r = DATA_MAPS[name].split("::")  # noqa: E741
         except Exception as e:
             logger.error(f"cannot find data source for {name}, reason: {e}")
             continue
